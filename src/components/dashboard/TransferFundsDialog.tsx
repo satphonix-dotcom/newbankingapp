@@ -63,6 +63,8 @@ const TransferFundsDialog = ({ userId, fromAccount }: TransferFundsDialogProps) 
   const { data: accounts, isLoading: accountsLoading } = useQuery({
     queryKey: ["accounts", userId],
     queryFn: async () => {
+      if (!userId) return [];
+      
       const { data, error } = await supabase
         .from("accounts")
         .select("*")
@@ -73,6 +75,7 @@ const TransferFundsDialog = ({ userId, fromAccount }: TransferFundsDialogProps) 
       if (error) throw error;
       return data;
     },
+    enabled: !!userId && !!fromAccount.id, // Only run query when we have both userId and fromAccount
   });
 
   const onSubmit = async (values: z.infer<typeof transferSchema>) => {
