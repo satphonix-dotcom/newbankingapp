@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
-import { UserCog } from "lucide-react";
+import { UserCog, Receipt } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 interface WelcomeProps {
@@ -48,15 +48,26 @@ const Welcome = ({ userId }: WelcomeProps) => {
         )}
       </div>
 
-      <Button
-        variant="outline"
-        size="sm"
-        className="flex items-center gap-2"
-        onClick={() => navigate("/profile")}
-      >
-        <UserCog className="h-4 w-4" />
-        Edit Profile
-      </Button>
+      <div className="flex gap-2">
+        <Button
+          variant="outline"
+          size="sm"
+          className="flex items-center gap-2"
+          onClick={() => navigate("/transactions")}
+        >
+          <Receipt className="h-4 w-4" />
+          Transactions
+        </Button>
+        <Button
+          variant="outline"
+          size="sm"
+          className="flex items-center gap-2"
+          onClick={() => navigate("/profile")}
+        >
+          <UserCog className="h-4 w-4" />
+          Edit Profile
+        </Button>
+      </div>
     </div>
   );
 };
