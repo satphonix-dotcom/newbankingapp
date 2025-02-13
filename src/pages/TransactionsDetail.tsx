@@ -175,12 +175,14 @@ const TransactionsDetail = () => {
               <div className="mt-4 flex justify-center">
                 <Pagination>
                   <PaginationContent>
-                    <PaginationItem>
-                      <PaginationPrevious 
-                        onClick={() => setPage(p => Math.max(1, p - 1))}
-                        disabled={page === 1}
-                      />
-                    </PaginationItem>
+                    {page > 1 && (
+                      <PaginationItem>
+                        <PaginationPrevious 
+                          onClick={() => setPage(p => Math.max(1, p - 1))}
+                          className={page === 1 ? "pointer-events-none opacity-50" : ""}
+                        />
+                      </PaginationItem>
+                    )}
                     {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNum) => (
                       <PaginationItem key={pageNum}>
                         <PaginationLink
@@ -191,12 +193,14 @@ const TransactionsDetail = () => {
                         </PaginationLink>
                       </PaginationItem>
                     ))}
-                    <PaginationItem>
-                      <PaginationNext 
-                        onClick={() => setPage(p => Math.min(totalPages, p + 1))}
-                        disabled={page === totalPages}
-                      />
-                    </PaginationItem>
+                    {page < totalPages && (
+                      <PaginationItem>
+                        <PaginationNext 
+                          onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+                          className={page === totalPages ? "pointer-events-none opacity-50" : ""}
+                        />
+                      </PaginationItem>
+                    )}
                   </PaginationContent>
                 </Pagination>
               </div>
