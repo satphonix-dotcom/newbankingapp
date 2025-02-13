@@ -24,6 +24,7 @@ interface FormValues {
   last_name: string;
   phone_number: string;
   country_code: string;
+  email: string;
 }
 
 const countryCodes = [
@@ -126,6 +127,7 @@ const Profile = () => {
       last_name: "",
       phone_number: "",
       country_code: "",
+      email: "",
     },
   });
 
@@ -134,7 +136,6 @@ const Profile = () => {
       const phoneNumber = profile.phone_number || "";
       let countryCode = phoneNumber.match(/^\+\d+/)?.[0];
       
-      // If no country code is found in the phone number, try to find it in the existing form values
       if (!countryCode) {
         countryCode = form.getValues().country_code || "+1";
       }
@@ -146,6 +147,7 @@ const Profile = () => {
         last_name: profile.last_name || "",
         phone_number: number,
         country_code: countryCode,
+        email: profile.email || "",
       }, {
         keepDefaultValues: true
       });
@@ -167,6 +169,7 @@ const Profile = () => {
           first_name: values.first_name,
           last_name: values.last_name,
           phone_number: `${values.country_code} ${values.phone_number}`,
+          email: values.email,
         })
         .eq("id", session.user.id);
 
@@ -274,6 +277,19 @@ const Profile = () => {
 
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+              <FormField
+                control={form.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Email</FormLabel>
+                    <FormControl>
+                      <Input {...field} type="email" />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+
               <FormField
                 control={form.control}
                 name="first_name"
