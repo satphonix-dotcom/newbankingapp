@@ -1,5 +1,5 @@
 
-import { Routes, Route, BrowserRouter as Router } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import Dashboard from "./pages/Dashboard";
 import SignIn from "./pages/SignIn";
@@ -30,7 +30,7 @@ import { Toaster } from "sonner";
 
 function App() {
   return (
-    <Router>
+    <>
       <Routes>
         <Route path="/" element={<Index />} />
         <Route path="/dashboard" element={<Dashboard />} />
@@ -60,7 +60,7 @@ function App() {
         <Route path="/admin/kyc/:id" element={<AdminKYCPage />} />
       </Routes>
       <Toaster />
-    </Router>
+    </>
   );
 }
 
