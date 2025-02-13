@@ -8,24 +8,43 @@ import { Session } from "@supabase/supabase-js";
 const Navigation = () => {
   const navigate = useNavigate();
   const [session, setSession] = useState<Session | null>(null);
+  const [isAdmin, setIsAdmin] = useState(false);
 
   // Effect to scroll to top when route changes
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [navigate]);
 
-  // Effect to handle auth state
+  // Effect to handle auth state and check admin role
   useEffect(() => {
     // Get initial session
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
       setSession(session);
+      if (session) {
+        const { data: roleData } = await supabase
+          .rpc('has_role', {
+            user_id: session.user.id,
+            required_role: 'admin'
+          });
+        setIsAdmin(!!roleData);
+      }
     });
 
     // Listen for auth changes
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
+    } = supabase.auth.onAuthStateChange(async (_event, session) => {
       setSession(session);
+      if (session) {
+        const { data: roleData } = await supabase
+          .rpc('has_role', {
+            user_id: session.user.id,
+            required_role: 'admin'
+          });
+        setIsAdmin(!!roleData);
+      } else {
+        setIsAdmin(false);
+      }
     });
 
     return () => subscription.unsubscribe();
@@ -63,6 +82,13 @@ const Navigation = () => {
                   Dashboard
                 </Button>
               </Link>
+              {isAdmin && (
+                <Link to="/admin-dashboard">
+                  <Button variant="ghost" className="hidden md:inline-flex">
+                    Admin Dashboard
+                  </Button>
+                </Link>
+              )}
               <Button onClick={handleSignOut} className="text-white">
                 Sign Out
               </Button>

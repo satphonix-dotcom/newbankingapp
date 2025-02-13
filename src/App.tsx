@@ -11,6 +11,7 @@ import About from "./pages/About";
 import GetStarted from "./pages/GetStarted";
 import SignIn from "./pages/SignIn";
 import Dashboard from "./pages/Dashboard";
+import AdminDashboard from "./pages/AdminDashboard";
 import Documentation from "./pages/Documentation";
 import HelpCenter from "./pages/HelpCenter";
 import Contact from "./pages/Contact";
@@ -40,6 +41,7 @@ const App = () => (
           <Route path="/get-started" element={<GetStarted />} />
           <Route path="/sign-in" element={<SignIn />} />
           <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/admin-dashboard" element={<AdminDashboard />} />
           <Route path="/documentation" element={<Documentation />} />
           <Route path="/help-center" element={<HelpCenter />} />
           <Route path="/contact" element={<Contact />} />
