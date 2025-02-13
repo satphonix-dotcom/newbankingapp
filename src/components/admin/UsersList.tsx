@@ -9,9 +9,19 @@ import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
 import UserDetailsDialog from "./UserDetailsDialog";
 
+type UserRole = "admin" | "user";
+
+interface UserProfile {
+  id: string;
+  first_name: string | null;
+  last_name: string | null;
+  created_at: string;
+  user_roles?: { role: UserRole }[];
+}
+
 const UsersList = () => {
   const { toast } = useToast();
-  const [selectedUser, setSelectedUser] = useState<any>(null);
+  const [selectedUser, setSelectedUser] = useState<UserProfile | null>(null);
 
   const { data: users, isLoading } = useQuery({
     queryKey: ["admin-users"],
@@ -34,7 +44,7 @@ const UsersList = () => {
         return [];
       }
 
-      return profiles;
+      return profiles as UserProfile[];
     },
   });
 

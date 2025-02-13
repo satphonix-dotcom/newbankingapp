@@ -19,8 +19,18 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
+type UserRole = "admin" | "user";
+
+interface UserProfile {
+  id: string;
+  first_name: string | null;
+  last_name: string | null;
+  created_at: string;
+  user_roles?: { role: UserRole }[];
+}
+
 interface UserDetailsDialogProps {
-  user: any;
+  user: UserProfile | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
@@ -34,7 +44,7 @@ const UserDetailsDialog = ({ user, open, onOpenChange }: UserDetailsDialogProps)
       const { data, error } = await supabase
         .from("accounts")
         .select("*")
-        .eq("user_id", user.id)
+        .eq("user_id", user!.id)
         .order("created_at");
 
       if (error) {
@@ -51,7 +61,7 @@ const UserDetailsDialog = ({ user, open, onOpenChange }: UserDetailsDialogProps)
     enabled: !!user?.id,
   });
 
-  const handleRoleChange = async (newRole: string) => {
+  const handleRoleChange = async (newRole: UserRole) => {
     if (!user) return;
 
     // First, delete existing roles
@@ -72,7 +82,7 @@ const UserDetailsDialog = ({ user, open, onOpenChange }: UserDetailsDialogProps)
     // Then, insert new role
     const { error: insertError } = await supabase
       .from("user_roles")
-      .insert([{ user_id: user.id, role: newRole }]);
+      .insert({ user_id: user.id, role: newRole });
 
     if (insertError) {
       toast({
