@@ -87,7 +87,8 @@ const TransferFundsDialog = ({ userId, fromAccount }: TransferFundsDialogProps) 
     }
 
     try {
-      const { error } = await supabase.from("transactions").insert({
+      // First create the transaction record
+      const { error: transactionError } = await supabase.from("transactions").insert({
         from_account_id: fromAccount.id,
         to_account_id: values.toAccountId,
         amount,
@@ -96,13 +97,16 @@ const TransferFundsDialog = ({ userId, fromAccount }: TransferFundsDialogProps) 
         description: values.description || "Fund transfer",
       });
 
-      if (error) throw error;
+      if (transactionError) throw transactionError;
 
-      await supabase.rpc('process_transfer', {
+      // Then process the transfer using raw SQL call since it's a custom function
+      const { error: transferError } = await supabase.rpc('process_transfer', {
         p_from_account_id: fromAccount.id,
         p_to_account_id: values.toAccountId,
         p_amount: amount
       });
+
+      if (transferError) throw transferError;
 
       toast({
         title: "Success",

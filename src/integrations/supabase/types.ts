@@ -220,6 +220,14 @@ export type Database = {
         }
         Returns: boolean
       }
+      process_transfer: {
+        Args: {
+          p_from_account_id: string
+          p_to_account_id: string
+          p_amount: number
+        }
+        Returns: undefined
+      }
     }
     Enums: {
       account_type: "current" | "savings" | "investment" | "fixed"
