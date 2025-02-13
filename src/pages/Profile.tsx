@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -121,12 +121,27 @@ const Profile = () => {
 
   const form = useForm<FormValues>({
     defaultValues: {
-      first_name: profile?.first_name || "",
-      last_name: profile?.last_name || "",
-      phone_number: profile?.phone_number?.replace(/^\+\d+\s*/, "") || "", // Remove country code if present
-      country_code: profile?.phone_number?.match(/^\+\d+/)?.[0] || "+1", // Extract country code or default to +1
+      first_name: "",
+      last_name: "",
+      phone_number: "",
+      country_code: "+1",
     },
   });
+
+  useEffect(() => {
+    if (profile) {
+      const phoneNumber = profile.phone_number || "";
+      const countryCode = phoneNumber.match(/^\+\d+/)?.[0] || "+1";
+      const number = phoneNumber.replace(/^\+\d+\s*/, "");
+
+      form.reset({
+        first_name: profile.first_name || "",
+        last_name: profile.last_name || "",
+        phone_number: number,
+        country_code: countryCode,
+      });
+    }
+  }, [profile, form]);
 
   const onSubmit = async (values: FormValues) => {
     if (!session?.user.id) return;
