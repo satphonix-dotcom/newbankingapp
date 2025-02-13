@@ -46,11 +46,21 @@ export const useTransferFunds = (fromAccount: any, onSuccess: () => void) => {
       // First, fetch the destination account to verify currency compatibility
       const { data: toAccount, error: accountError } = await supabase
         .from("accounts")
-        .select("currency")
+        .select("currency, is_restricted")
         .eq("id", values.toAccountId)
         .single();
 
       if (accountError) throw accountError;
+
+      // Check if destination account is restricted
+      if (toAccount.is_restricted) {
+        toast({
+          variant: "destructive",
+          title: "Transfer not allowed",
+          description: "The destination account is restricted",
+        });
+        return;
+      }
 
       // Validate currencies match
       if (toAccount.currency !== fromAccount.currency) {
@@ -62,7 +72,27 @@ export const useTransferFunds = (fromAccount: any, onSuccess: () => void) => {
         return;
       }
 
-      // Create transaction record
+      // Process the transfer first
+      const { error: transferError } = await supabase.rpc('process_transfer', {
+        p_from_account_id: fromAccount.id,
+        p_to_account_id: values.toAccountId,
+        p_amount: amount
+      });
+
+      if (transferError) {
+        if (transferError.message === "Insufficient funds") {
+          toast({
+            variant: "destructive",
+            title: "Insufficient funds",
+            description: "You don't have enough balance for this transfer",
+          });
+        } else {
+          throw transferError;
+        }
+        return;
+      }
+
+      // Only create transaction record after successful transfer
       const { error: transactionError } = await supabase
         .from("transactions")
         .insert({
@@ -76,15 +106,6 @@ export const useTransferFunds = (fromAccount: any, onSuccess: () => void) => {
         });
 
       if (transactionError) throw transactionError;
-
-      // Process the transfer
-      const { error: transferError } = await supabase.rpc('process_transfer', {
-        p_from_account_id: fromAccount.id,
-        p_to_account_id: values.toAccountId,
-        p_amount: amount
-      });
-
-      if (transferError) throw transferError;
 
       toast({
         title: "Success",
