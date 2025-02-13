@@ -1,12 +1,10 @@
 
-import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { Download, Loader2, Search } from "lucide-react";
+import { Download, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
   Table,
@@ -21,7 +19,6 @@ import { useToast } from "@/components/ui/use-toast";
 const TransactionsDetail = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const [searchTerm, setSearchTerm] = useState("");
 
   const { data: accounts } = useQuery({
     queryKey: ["user-accounts"],
@@ -40,7 +37,7 @@ const TransactionsDetail = () => {
   });
 
   const { data: transactions, isLoading } = useQuery({
-    queryKey: ["transactions-detail", accounts, searchTerm],
+    queryKey: ["transactions-detail", accounts],
     queryFn: async () => {
       if (!accounts?.length) return [];
       const query = supabase
@@ -52,10 +49,6 @@ const TransactionsDetail = () => {
         `)
         .or(`from_account_id.in.(${accounts?.map(a => a.id).join(",")}),to_account_id.in.(${accounts?.map(a => a.id).join(",")})`)
         .order("created_at", { ascending: false });
-
-      if (searchTerm) {
-        query.or(`description.ilike.%${searchTerm}%,type.ilike.%${searchTerm}%`);
-      }
 
       const { data, error } = await query;
 
@@ -112,18 +105,6 @@ const TransactionsDetail = () => {
             <Download className="h-4 w-4 mr-2" />
             Export CSV
           </Button>
-        </div>
-
-        <div className="mb-6">
-          <div className="relative">
-            <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="Search transactions..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10"
-            />
-          </div>
         </div>
 
         {isLoading ? (
