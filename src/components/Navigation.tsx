@@ -2,6 +2,7 @@
 import { Button } from "./ui/button";
 import { Link, useNavigate } from "react-router-dom";
 import { useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
 
 const Navigation = () => {
   const navigate = useNavigate();
@@ -10,6 +11,11 @@ const Navigation = () => {
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [navigate]);
+
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
+    navigate("/");
+  };
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-lg border-b border-border">
@@ -31,16 +37,31 @@ const Navigation = () => {
         </div>
 
         <div className="flex items-center space-x-4">
-          <Link to="/sign-in">
-            <Button variant="ghost" className="hidden md:inline-flex">
-              Sign In
-            </Button>
-          </Link>
-          <Link to="/get-started">
-            <Button className="text-white">
-              Get Started
-            </Button>
-          </Link>
+          {supabase.auth.getSession() ? (
+            <>
+              <Link to="/dashboard">
+                <Button variant="ghost" className="hidden md:inline-flex">
+                  Dashboard
+                </Button>
+              </Link>
+              <Button onClick={handleSignOut} className="text-white">
+                Sign Out
+              </Button>
+            </>
+          ) : (
+            <>
+              <Link to="/sign-in">
+                <Button variant="ghost" className="hidden md:inline-flex">
+                  Sign In
+                </Button>
+              </Link>
+              <Link to="/get-started">
+                <Button className="text-white">
+                  Get Started
+                </Button>
+              </Link>
+            </>
+          )}
         </div>
       </div>
     </nav>
