@@ -55,5 +55,5 @@
 }
 
 [role="status"][data-state="open"][data-swipe="none"][data-variant="destructive"] {
-  @apply bg-destructive text-destructive-foreground border-destructive/50;
+  @apply bg-red-600 text-white border-red-600/50;
 }

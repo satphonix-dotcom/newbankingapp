@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -29,6 +30,8 @@ export default {
         border: "#E6E4DD",
         input: "#F0EFEA",
         foreground: "hsl(var(--foreground))",
+        destructive: "hsl(var(--destructive))",
+        "destructive-foreground": "hsl(var(--destructive-foreground))",
       },
       textColor: {
         foreground: "hsl(var(--foreground))",
