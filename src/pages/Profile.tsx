@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
@@ -124,14 +125,20 @@ const Profile = () => {
       first_name: "",
       last_name: "",
       phone_number: "",
-      country_code: "+1",
+      country_code: "",
     },
   });
 
   useEffect(() => {
     if (profile) {
       const phoneNumber = profile.phone_number || "";
-      const countryCode = phoneNumber.match(/^\+\d+/)?.[0] || "+1";
+      let countryCode = phoneNumber.match(/^\+\d+/)?.[0];
+      
+      // If no country code is found in the phone number, try to find it in the existing form values
+      if (!countryCode) {
+        countryCode = form.getValues().country_code || "+1";
+      }
+      
       const number = phoneNumber.replace(/^\+\d+\s*/, "");
 
       form.reset({
@@ -139,6 +146,8 @@ const Profile = () => {
         last_name: profile.last_name || "",
         phone_number: number,
         country_code: countryCode,
+      }, {
+        keepDefaultValues: true
       });
     }
   }, [profile, form]);
