@@ -9,19 +9,28 @@ import AccountsList from "@/components/dashboard/AccountsList";
 import CreateAccountDialog from "@/components/dashboard/CreateAccountDialog";
 import TransactionsList from "@/components/dashboard/TransactionsList";
 import { useQuery } from "@tanstack/react-query";
+import { Loader2 } from "lucide-react";
 
 const Dashboard = () => {
   const navigate = useNavigate();
   const [userId, setUserId] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const checkAuth = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session) {
+          navigate("/sign-in");
+          return;
+        }
+        setUserId(session.user.id);
+      } catch (error) {
+        console.error("Auth error:", error);
         navigate("/sign-in");
-        return;
+      } finally {
+        setIsLoading(false);
       }
-      setUserId(session.user.id);
     };
 
     checkAuth();
@@ -31,16 +40,29 @@ const Dashboard = () => {
     queryKey: ["accounts", userId],
     queryFn: async () => {
       if (!userId) return [];
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from("accounts")
         .select("*")
         .eq("user_id", userId)
         .order("created_at");
 
+      if (error) {
+        console.error("Error fetching accounts:", error);
+        return [];
+      }
+
       return data || [];
     },
-    enabled: !!userId,
+    enabled: !!userId && !isLoading,
   });
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin" />
+      </div>
+    );
+  }
 
   if (!userId) {
     return null;
