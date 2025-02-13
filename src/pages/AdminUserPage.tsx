@@ -1,27 +1,19 @@
+
 import { useNavigate, useParams } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Loader2 } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import ProfileEditForm from "@/components/admin/ProfileEditForm";
-import { Switch } from "@/components/ui/switch";
-import { AlertDialog, AlertDialogTrigger, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from "@/components/ui/alert-dialog";
-import { Input } from "@/components/ui/input";
+import LoadingState from "@/components/admin/LoadingState";
+import AccessDenied from "@/components/admin/AccessDenied";
+import UserAccounts from "@/components/admin/UserAccounts";
+import UserRoleManagement from "@/components/admin/UserRoleManagement";
 
 type UserRole = "admin" | "user";
-type CurrencyType = "USD" | "GBP" | "EUR" | "CNY";
 
 interface UserProfile {
   id: string;
@@ -36,7 +28,6 @@ interface UserProfile {
 const AdminUserPage = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { toast } = useToast();
   const queryClient = useQueryClient();
 
   const { data: isAdmin, isLoading: isCheckingAdmin } = useQuery({
@@ -70,11 +61,6 @@ const AdminUserPage = () => {
 
       if (error) {
         console.error("Error fetching user:", error);
-        toast({
-          variant: "destructive",
-          title: "Error",
-          description: "Failed to fetch user details",
-        });
         return null;
       }
 
@@ -94,11 +80,6 @@ const AdminUserPage = () => {
 
       if (error) {
         console.error("Error fetching accounts:", error);
-        toast({
-          variant: "destructive",
-          title: "Error",
-          description: "Failed to fetch user accounts",
-        });
         return [];
       }
 
@@ -107,238 +88,16 @@ const AdminUserPage = () => {
     enabled: !!id && !!isAdmin,
   });
 
-  const handleRoleChange = async (newRole: UserRole) => {
-    if (!user) return;
-
-    // First, delete existing roles
-    const { error: deleteError } = await supabase
-      .from("user_roles")
-      .delete()
-      .eq("user_id", user.id);
-
-    if (deleteError) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Failed to update user role",
-      });
-      return;
-    }
-
-    // Then, insert new role
-    const { error: insertError } = await supabase
-      .from("user_roles")
-      .insert({ user_id: user.id, role: newRole });
-
-    if (insertError) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Failed to update user role",
-      });
-      return;
-    }
-
-    toast({
-      title: "Success",
-      description: "User role updated successfully",
-    });
-    
-    // Refresh the user data
-    queryClient.invalidateQueries({ queryKey: ["admin-user", id] });
-  };
-
-  const handleProfileUpdate = () => {
-    // Refresh the users list and current user data
-    queryClient.invalidateQueries({ queryKey: ["admin-users"] });
-    queryClient.invalidateQueries({ queryKey: ["admin-user", id] });
-  };
-
-  const handleAccountUpdate = async (accountId: string, changes: {
-    is_restricted?: boolean;
-    restriction_reason?: string;
-    balance?: number;
-  }) => {
-    try {
-      const { error } = await supabase
-        .from("accounts")
-        .update(changes)
-        .eq("id", accountId);
-
-      if (error) throw error;
-
-      toast({
-        title: "Success",
-        description: "Account updated successfully",
-      });
-      queryClient.invalidateQueries({ queryKey: ["admin-user-accounts", id] });
-    } catch (error) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Failed to update account",
-      });
-    }
-  };
-
-  const handleAddFunds = async (accountId: string, amount: number, currency: CurrencyType, memo: string) => {
-    try {
-      const { data: account, error: fetchError } = await supabase
-        .from("accounts")
-        .select("balance")
-        .eq("id", accountId)
-        .single();
-
-      if (fetchError) throw fetchError;
-
-      const newBalance = (account?.balance || 0) + amount;
-      const { error: updateError } = await supabase
-        .from("accounts")
-        .update({ balance: newBalance })
-        .eq("id", accountId);
-
-      if (updateError) throw updateError;
-
-      const { error: transactionError } = await supabase
-        .from("transactions")
-        .insert({
-          amount,
-          currency,
-          type: 'deposit',
-          status: 'completed',
-          to_account_id: accountId,
-          description: memo || 'Funds added by admin'
-        });
-
-      if (transactionError) throw transactionError;
-
-      toast({
-        title: "Success",
-        description: `Added ${new Intl.NumberFormat("en-US", {
-          style: "currency",
-          currency: currency,
-        }).format(amount)} to account`,
-      });
-      
-      queryClient.invalidateQueries({ queryKey: ["admin-user-accounts", id] });
-      queryClient.invalidateQueries({ queryKey: ["transactions"] });
-    } catch (error) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Failed to add funds",
-      });
-    }
-  };
-
-  const handleDeductFunds = async (accountId: string, amount: number, currency: CurrencyType, memo: string) => {
-    try {
-      const { data: account, error: fetchError } = await supabase
-        .from("accounts")
-        .select("balance")
-        .eq("id", accountId)
-        .single();
-
-      if (fetchError) throw fetchError;
-
-      if ((account?.balance || 0) < amount) {
-        toast({
-          variant: "destructive",
-          title: "Error",
-          description: "Insufficient funds in the account",
-        });
-        return;
-      }
-
-      const newBalance = (account?.balance || 0) - amount;
-      const { error: updateError } = await supabase
-        .from("accounts")
-        .update({ balance: newBalance })
-        .eq("id", accountId);
-
-      if (updateError) throw updateError;
-
-      const { error: transactionError } = await supabase
-        .from("transactions")
-        .insert({
-          amount,
-          currency,
-          type: 'withdrawal',
-          status: 'completed',
-          from_account_id: accountId,
-          description: memo || 'Funds deducted by admin'
-        });
-
-      if (transactionError) throw transactionError;
-
-      toast({
-        title: "Success",
-        description: `Deducted ${new Intl.NumberFormat("en-US", {
-          style: "currency",
-          currency: currency,
-        }).format(amount)} from account`,
-      });
-      
-      queryClient.invalidateQueries({ queryKey: ["admin-user-accounts", id] });
-      queryClient.invalidateQueries({ queryKey: ["transactions"] });
-    } catch (error) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Failed to deduct funds",
-      });
-    }
-  };
-
   if (isCheckingAdmin) {
-    return (
-      <div className="min-h-screen bg-background">
-        <Navigation />
-        <main className="container mx-auto pt-24 px-4">
-          <div className="flex justify-center">
-            <Loader2 className="h-6 w-6 animate-spin" />
-          </div>
-        </main>
-        <Footer />
-      </div>
-    );
+    return <LoadingState />;
   }
 
   if (!isAdmin) {
-    return (
-      <div className="min-h-screen bg-background">
-        <Navigation />
-        <main className="container mx-auto pt-24 px-4">
-          <div className="text-center">
-            <h1 className="text-2xl font-bold text-destructive">Access Denied</h1>
-            <p className="mt-2 text-muted-foreground">You must be an admin to view this page.</p>
-            <Button
-              variant="ghost"
-              className="mt-4"
-              onClick={() => navigate("/dashboard")}
-            >
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Back to Dashboard
-            </Button>
-          </div>
-        </main>
-        <Footer />
-      </div>
-    );
+    return <AccessDenied />;
   }
 
   if (isUserLoading) {
-    return (
-      <div className="min-h-screen bg-background">
-        <Navigation />
-        <main className="container mx-auto pt-24 px-4">
-          <div className="flex justify-center">
-            <Loader2 className="h-6 w-6 animate-spin" />
-          </div>
-        </main>
-        <Footer />
-      </div>
-    );
+    return <LoadingState />;
   }
 
   if (!user) {
@@ -388,183 +147,31 @@ const AdminUserPage = () => {
               <CardTitle className="text-lg">Profile Information</CardTitle>
             </CardHeader>
             <CardContent>
-              <ProfileEditForm user={user} onSuccess={handleProfileUpdate} />
+              <ProfileEditForm
+                user={user}
+                onSuccess={() => {
+                  queryClient.invalidateQueries({ queryKey: ["admin-users"] });
+                  queryClient.invalidateQueries({ queryKey: ["admin-user", id] });
+                }}
+              />
             </CardContent>
           </Card>
 
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg">User Role</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <Select
-                value={user.user_roles?.[0]?.role || "user"}
-                onValueChange={handleRoleChange}
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="user">User</SelectItem>
-                  <SelectItem value="admin">Admin</SelectItem>
-                </SelectContent>
-              </Select>
-            </CardContent>
-          </Card>
+          <UserRoleManagement
+            userId={user.id}
+            currentRole={user.user_roles?.[0]?.role || "user"}
+          />
 
           <Card>
             <CardHeader>
               <CardTitle className="text-lg">Accounts</CardTitle>
             </CardHeader>
             <CardContent>
-              {isAccountsLoading ? (
-                <div className="flex justify-center p-4">
-                  <Loader2 className="h-6 w-6 animate-spin" />
-                </div>
-              ) : accounts && accounts.length > 0 ? (
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Name</TableHead>
-                      <TableHead>Type</TableHead>
-                      <TableHead>Currency</TableHead>
-                      <TableHead>Balance</TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead>Actions</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {accounts.map((account) => (
-                      <TableRow key={account.id}>
-                        <TableCell>{account.name}</TableCell>
-                        <TableCell className="capitalize">
-                          {account.account_type}
-                        </TableCell>
-                        <TableCell>{account.currency}</TableCell>
-                        <TableCell>
-                          {new Intl.NumberFormat("en-US", {
-                            style: "currency",
-                            currency: account.currency,
-                          }).format(account.balance)}
-                        </TableCell>
-                        <TableCell>
-                          <Switch
-                            checked={!account.is_restricted}
-                            onCheckedChange={(checked) => handleAccountUpdate(account.id, {
-                              is_restricted: !checked,
-                              restriction_reason: !checked ? "Restricted by admin" : ""
-                            })}
-                          />
-                        </TableCell>
-                        <TableCell>
-                          <div className="space-x-2">
-                            <AlertDialog>
-                              <AlertDialogTrigger asChild>
-                                <Button variant="outline" size="sm">
-                                  Add Funds
-                                </Button>
-                              </AlertDialogTrigger>
-                              <AlertDialogContent>
-                                <AlertDialogHeader>
-                                  <AlertDialogTitle>Add Funds</AlertDialogTitle>
-                                  <AlertDialogDescription>
-                                    Enter the amount and memo for this transaction.
-                                  </AlertDialogDescription>
-                                </AlertDialogHeader>
-                                <div className="space-y-4 py-4">
-                                  <div>
-                                    <Input
-                                      type="number"
-                                      placeholder="Amount"
-                                      id={`amount-add-${account.id}`}
-                                      min="0"
-                                      step="0.01"
-                                    />
-                                  </div>
-                                  <div>
-                                    <Input
-                                      type="text"
-                                      placeholder="Memo (optional)"
-                                      id={`memo-add-${account.id}`}
-                                    />
-                                  </div>
-                                </div>
-                                <AlertDialogFooter>
-                                  <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                  <AlertDialogAction onClick={() => {
-                                    const amount = parseFloat(
-                                      (document.getElementById(`amount-add-${account.id}`) as HTMLInputElement).value
-                                    );
-                                    const memo = (document.getElementById(`memo-add-${account.id}`) as HTMLInputElement).value;
-                                    if (!isNaN(amount) && amount > 0) {
-                                      handleAddFunds(account.id, amount, account.currency, memo);
-                                    }
-                                  }}>
-                                    Add Funds
-                                  </AlertDialogAction>
-                                </AlertDialogFooter>
-                              </AlertDialogContent>
-                            </AlertDialog>
-
-                            <AlertDialog>
-                              <AlertDialogTrigger asChild>
-                                <Button variant="outline" size="sm" className="bg-destructive/10 hover:bg-destructive/20">
-                                  Deduct Funds
-                                </Button>
-                              </AlertDialogTrigger>
-                              <AlertDialogContent>
-                                <AlertDialogHeader>
-                                  <AlertDialogTitle>Deduct Funds</AlertDialogTitle>
-                                  <AlertDialogDescription>
-                                    Enter the amount and memo for this transaction.
-                                  </AlertDialogDescription>
-                                </AlertDialogHeader>
-                                <div className="space-y-4 py-4">
-                                  <div>
-                                    <Input
-                                      type="number"
-                                      placeholder="Amount"
-                                      id={`amount-deduct-${account.id}`}
-                                      min="0"
-                                      step="0.01"
-                                      max={account.balance}
-                                    />
-                                  </div>
-                                  <div>
-                                    <Input
-                                      type="text"
-                                      placeholder="Memo (optional)"
-                                      id={`memo-deduct-${account.id}`}
-                                    />
-                                  </div>
-                                </div>
-                                <AlertDialogFooter>
-                                  <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                  <AlertDialogAction onClick={() => {
-                                    const amount = parseFloat(
-                                      (document.getElementById(`amount-deduct-${account.id}`) as HTMLInputElement).value
-                                    );
-                                    const memo = (document.getElementById(`memo-deduct-${account.id}`) as HTMLInputElement).value;
-                                    if (!isNaN(amount) && amount > 0) {
-                                      handleDeductFunds(account.id, amount, account.currency, memo);
-                                    }
-                                  }}>
-                                    Deduct Funds
-                                  </AlertDialogAction>
-                                </AlertDialogFooter>
-                              </AlertDialogContent>
-                            </AlertDialog>
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              ) : (
-                <p className="text-center text-muted-foreground py-4">
-                  No accounts found
-                </p>
-              )}
+              <UserAccounts
+                accounts={accounts}
+                isLoading={isAccountsLoading}
+                userId={user.id}
+              />
             </CardContent>
           </Card>
         </div>
