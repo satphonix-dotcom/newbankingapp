@@ -65,6 +65,51 @@ export type Database = {
           },
         ]
       }
+      kyc_requests: {
+        Row: {
+          created_at: string
+          document_back_url: string | null
+          document_expiry: string | null
+          document_front_url: string | null
+          document_number: string | null
+          document_type: string | null
+          id: string
+          rejection_reason: string | null
+          selfie_url: string | null
+          status: Database["public"]["Enums"]["kyc_status"]
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          document_back_url?: string | null
+          document_expiry?: string | null
+          document_front_url?: string | null
+          document_number?: string | null
+          document_type?: string | null
+          id?: string
+          rejection_reason?: string | null
+          selfie_url?: string | null
+          status?: Database["public"]["Enums"]["kyc_status"]
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          document_back_url?: string | null
+          document_expiry?: string | null
+          document_front_url?: string | null
+          document_number?: string | null
+          document_type?: string | null
+          id?: string
+          rejection_reason?: string | null
+          selfie_url?: string | null
+          status?: Database["public"]["Enums"]["kyc_status"]
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -233,6 +278,7 @@ export type Database = {
       account_type: "current" | "savings" | "investment" | "fixed"
       app_role: "admin" | "user"
       currency_type: "USD" | "GBP" | "EUR" | "CNY"
+      kyc_status: "pending" | "submitted" | "approved" | "rejected"
     }
     CompositeTypes: {
       [_ in never]: never
