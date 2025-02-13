@@ -67,46 +67,70 @@ export type Database = {
       }
       kyc_requests: {
         Row: {
+          address_line1: string | null
+          address_line2: string | null
+          city: string | null
+          country: string | null
           created_at: string
           document_back_url: string | null
           document_expiry: string | null
           document_front_url: string | null
           document_number: string | null
           document_type: string | null
+          govt_id_url: string | null
           id: string
+          postal_code: string | null
           rejection_reason: string | null
           selfie_url: string | null
+          state: string | null
           status: Database["public"]["Enums"]["kyc_status"]
           updated_at: string
           user_id: string
+          utility_bill_url: string | null
         }
         Insert: {
+          address_line1?: string | null
+          address_line2?: string | null
+          city?: string | null
+          country?: string | null
           created_at?: string
           document_back_url?: string | null
           document_expiry?: string | null
           document_front_url?: string | null
           document_number?: string | null
           document_type?: string | null
+          govt_id_url?: string | null
           id?: string
+          postal_code?: string | null
           rejection_reason?: string | null
           selfie_url?: string | null
+          state?: string | null
           status?: Database["public"]["Enums"]["kyc_status"]
           updated_at?: string
           user_id: string
+          utility_bill_url?: string | null
         }
         Update: {
+          address_line1?: string | null
+          address_line2?: string | null
+          city?: string | null
+          country?: string | null
           created_at?: string
           document_back_url?: string | null
           document_expiry?: string | null
           document_front_url?: string | null
           document_number?: string | null
           document_type?: string | null
+          govt_id_url?: string | null
           id?: string
+          postal_code?: string | null
           rejection_reason?: string | null
           selfie_url?: string | null
+          state?: string | null
           status?: Database["public"]["Enums"]["kyc_status"]
           updated_at?: string
           user_id?: string
+          utility_bill_url?: string | null
         }
         Relationships: []
       }
