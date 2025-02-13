@@ -110,12 +110,12 @@ const Dashboard = () => {
 
     const { error } = await supabase
       .from("accounts")
-      .insert({
+      .insert([{  // Note: We're now passing an array with one object
         user_id: userId,
         name: newAccount.name,
-        account_type: newAccount.type,
-        currency: newAccount.currency,
-      });
+        account_type: newAccount.type as "current" | "savings" | "investment" | "fixed",
+        currency: newAccount.currency as "USD" | "GBP" | "EUR" | "CNY",
+      }]);
 
     if (error) {
       toast({
