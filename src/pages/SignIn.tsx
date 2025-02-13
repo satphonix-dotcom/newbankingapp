@@ -19,19 +19,15 @@ import { useToast } from "@/components/ui/use-toast";
 import { Link } from "react-router-dom";
 
 const formSchema = z.object({
-  firstName: z.string().min(2, "First name must be at least 2 characters"),
-  lastName: z.string().min(2, "Last name must be at least 2 characters"),
   email: z.string().email("Please enter a valid email address"),
   password: z.string().min(8, "Password must be at least 8 characters"),
 });
 
-const GetStarted = () => {
+const SignIn = () => {
   const { toast } = useToast();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      firstName: "",
-      lastName: "",
       email: "",
       password: "",
     },
@@ -39,8 +35,8 @@ const GetStarted = () => {
 
   function onSubmit(values: z.infer<typeof formSchema>) {
     toast({
-      title: "Account creation initiated",
-      description: "We'll send you an email to verify your account.",
+      title: "Signing in",
+      description: "Verifying your credentials...",
     });
     console.log(values);
   }
@@ -53,44 +49,15 @@ const GetStarted = () => {
           <div className="max-w-md mx-auto">
             <div className="text-center mb-8">
               <h1 className="text-3xl font-bold tracking-tight text-primary mb-2">
-                Create your account
+                Welcome back
               </h1>
               <p className="text-secondary">
-                Start your journey to better banking today
+                Sign in to access your account
               </p>
             </div>
 
             <Form {...form}>
               <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-                <div className="grid grid-cols-2 gap-4">
-                  <FormField
-                    control={form.control}
-                    name="firstName"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>First name</FormLabel>
-                        <FormControl>
-                          <Input placeholder="John" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="lastName"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Last name</FormLabel>
-                        <FormControl>
-                          <Input placeholder="Doe" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-
                 <FormField
                   control={form.control}
                   name="email"
@@ -120,15 +87,15 @@ const GetStarted = () => {
                 />
 
                 <Button type="submit" className="w-full">
-                  Create Account <ArrowRight className="w-4 h-4 ml-2" />
+                  Sign In <ArrowRight className="w-4 h-4 ml-2" />
                 </Button>
               </form>
             </Form>
 
             <p className="mt-4 text-center text-sm text-secondary">
-              Already have an account?{" "}
-              <Link to="/sign-in" className="text-primary hover:underline">
-                Sign in
+              Don't have an account?{" "}
+              <Link to="/get-started" className="text-primary hover:underline">
+                Create one
               </Link>
             </p>
           </div>
@@ -139,4 +106,4 @@ const GetStarted = () => {
   );
 };
 
-export default GetStarted;
+export default SignIn;

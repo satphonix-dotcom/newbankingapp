@@ -23,9 +23,11 @@ const Navigation = () => {
         </div>
 
         <div className="flex items-center space-x-4">
-          <Button variant="ghost" className="hidden md:inline-flex">
-            Sign In
-          </Button>
+          <Link to="/sign-in">
+            <Button variant="ghost" className="hidden md:inline-flex">
+              Sign In
+            </Button>
+          </Link>
           <Link to="/get-started">
             <Button className="text-white">
               Get Started
