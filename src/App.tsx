@@ -1,3 +1,4 @@
+
 import { Routes, Route, BrowserRouter as Router } from "react-router-dom";
 import Index from "./pages/Index";
 import Dashboard from "./pages/Dashboard";
@@ -25,7 +26,7 @@ import Cookies from "./pages/Cookies";
 import KYC from "./pages/KYC";
 import KYCSubmit from "./pages/KYCSubmit";
 import AdminKYCPage from "./pages/AdminKYCPage";
-import { Toaster } from "react-hot-toast";
+import { Toaster } from "sonner";
 
 function App() {
   return (
