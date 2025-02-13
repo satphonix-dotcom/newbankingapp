@@ -1,5 +1,4 @@
-
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, BrowserRouter as Router } from "react-router-dom";
 import Index from "./pages/Index";
 import Dashboard from "./pages/Dashboard";
 import SignIn from "./pages/SignIn";
@@ -25,36 +24,42 @@ import Privacy from "./pages/Privacy";
 import Cookies from "./pages/Cookies";
 import KYC from "./pages/KYC";
 import KYCSubmit from "./pages/KYCSubmit";
+import AdminKYCPage from "./pages/AdminKYCPage";
+import { Toaster } from "react-hot-toast";
 
 function App() {
   return (
-    <Routes>
-      <Route path="/" element={<Index />} />
-      <Route path="/dashboard" element={<Dashboard />} />
-      <Route path="/sign-in" element={<SignIn />} />
-      <Route path="/get-started" element={<GetStarted />} />
-      <Route path="/features" element={<Features />} />
-      <Route path="/pricing" element={<Pricing />} />
-      <Route path="/about" element={<About />} />
-      <Route path="/profile" element={<Profile />} />
-      <Route path="/admin-dashboard" element={<AdminDashboard />} />
-      <Route path="/admin-dashboard/user/:userId" element={<AdminUserPage />} />
-      <Route path="/account/:accountId" element={<AccountDetail />} />
-      <Route path="/transactions" element={<TransactionsDetail />} />
-      <Route path="/blog" element={<Blog />} />
-      <Route path="/careers" element={<Careers />} />
-      <Route path="/contact" element={<Contact />} />
-      <Route path="/documentation" element={<Documentation />} />
-      <Route path="/help-center" element={<HelpCenter />} />
-      <Route path="/press" element={<Press />} />
-      <Route path="/security" element={<Security />} />
-      <Route path="/status" element={<Status />} />
-      <Route path="/terms" element={<Terms />} />
-      <Route path="/privacy" element={<Privacy />} />
-      <Route path="/cookies" element={<Cookies />} />
-      <Route path="/kyc" element={<KYC />} />
-      <Route path="/kyc/submit" element={<KYCSubmit />} />
-    </Routes>
+    <Router>
+      <Routes>
+        <Route path="/" element={<Index />} />
+        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/sign-in" element={<SignIn />} />
+        <Route path="/get-started" element={<GetStarted />} />
+        <Route path="/features" element={<Features />} />
+        <Route path="/pricing" element={<Pricing />} />
+        <Route path="/about" element={<About />} />
+        <Route path="/profile" element={<Profile />} />
+        <Route path="/admin-dashboard" element={<AdminDashboard />} />
+        <Route path="/admin-dashboard/user/:userId" element={<AdminUserPage />} />
+        <Route path="/account/:accountId" element={<AccountDetail />} />
+        <Route path="/transactions" element={<TransactionsDetail />} />
+        <Route path="/blog" element={<Blog />} />
+        <Route path="/careers" element={<Careers />} />
+        <Route path="/contact" element={<Contact />} />
+        <Route path="/documentation" element={<Documentation />} />
+        <Route path="/help-center" element={<HelpCenter />} />
+        <Route path="/press" element={<Press />} />
+        <Route path="/security" element={<Security />} />
+        <Route path="/status" element={<Status />} />
+        <Route path="/terms" element={<Terms />} />
+        <Route path="/privacy" element={<Privacy />} />
+        <Route path="/cookies" element={<Cookies />} />
+        <Route path="/kyc" element={<KYC />} />
+        <Route path="/kyc/submit" element={<KYCSubmit />} />
+        <Route path="/admin/kyc/:id" element={<AdminKYCPage />} />
+      </Routes>
+      <Toaster />
+    </Router>
   );
 }
 
