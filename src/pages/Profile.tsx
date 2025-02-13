@@ -309,7 +309,7 @@ const Profile = () => {
                       <FormLabel>Country Code</FormLabel>
                       <Select
                         onValueChange={field.onChange}
-                        defaultValue={field.value}
+                        value={field.value || "+1"}
                       >
                         <FormControl>
                           <SelectTrigger className="bg-white">
