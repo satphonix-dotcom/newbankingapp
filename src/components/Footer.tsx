@@ -1,22 +1,43 @@
+
 import { Link } from "react-router-dom";
 
 const Footer = () => {
   const footerSections = [
     {
       title: "Product",
-      links: ["Features", "Pricing", "Security", "Updates"],
+      links: [
+        { name: "Features", path: "/features" },
+        { name: "Pricing", path: "/pricing" },
+        { name: "Security", path: "/security" },
+        { name: "Status", path: "/status" }
+      ],
     },
     {
       title: "Company",
-      links: ["About", "Blog", "Careers", "Press"],
+      links: [
+        { name: "About", path: "/about" },
+        { name: "Blog", path: "/blog" },
+        { name: "Careers", path: "/careers" },
+        { name: "Press", path: "/press" }
+      ],
     },
     {
       title: "Resources",
-      links: ["Documentation", "Help Center", "Contact", "Status"],
+      links: [
+        { name: "Documentation", path: "/documentation" },
+        { name: "Help Center", path: "/help-center" },
+        { name: "Contact", path: "/contact" },
+        { name: "Status", path: "/status" }
+      ],
     },
     {
       title: "Legal",
-      links: ["Privacy", "Terms", "Security", "Cookies"],
+      links: [
+        { name: "Privacy", path: "/privacy" },
+        { name: "Terms", path: "/terms" },
+        { name: "Security", path: "/security" },
+        { name: "Cookies", path: "/cookies" }
+      ],
     },
   ];
 
@@ -29,12 +50,12 @@ const Footer = () => {
               <h3 className="font-semibold mb-4">{section.title}</h3>
               <ul className="space-y-2">
                 {section.links.map((link) => (
-                  <li key={link}>
+                  <li key={link.name}>
                     <Link
-                      to={`/${link.toLowerCase()}`}
+                      to={link.path}
                       className="text-white/70 hover:text-white transition-colors"
                     >
-                      {link}
+                      {link.name}
                     </Link>
                   </li>
                 ))}

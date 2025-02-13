@@ -10,6 +10,17 @@ import Pricing from "./pages/Pricing";
 import About from "./pages/About";
 import GetStarted from "./pages/GetStarted";
 import SignIn from "./pages/SignIn";
+import Documentation from "./pages/Documentation";
+import HelpCenter from "./pages/HelpCenter";
+import Contact from "./pages/Contact";
+import Status from "./pages/Status";
+import Blog from "./pages/Blog";
+import Careers from "./pages/Careers";
+import Press from "./pages/Press";
+import Privacy from "./pages/Privacy";
+import Terms from "./pages/Terms";
+import Security from "./pages/Security";
+import Cookies from "./pages/Cookies";
 
 const queryClient = new QueryClient();
 
@@ -26,6 +37,17 @@ const App = () => (
           <Route path="/about" element={<About />} />
           <Route path="/get-started" element={<GetStarted />} />
           <Route path="/sign-in" element={<SignIn />} />
+          <Route path="/documentation" element={<Documentation />} />
+          <Route path="/help-center" element={<HelpCenter />} />
+          <Route path="/contact" element={<Contact />} />
+          <Route path="/status" element={<Status />} />
+          <Route path="/blog" element={<Blog />} />
+          <Route path="/careers" element={<Careers />} />
+          <Route path="/press" element={<Press />} />
+          <Route path="/privacy" element={<Privacy />} />
+          <Route path="/terms" element={<Terms />} />
+          <Route path="/security" element={<Security />} />
+          <Route path="/cookies" element={<Cookies />} />
         </Routes>
       </BrowserRouter>
     </TooltipProvider>
