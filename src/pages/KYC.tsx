@@ -126,9 +126,9 @@ const KYC = () => {
                   <div className="flex items-start gap-4 p-4 border rounded-lg">
                     <Camera className="h-6 w-6 text-muted-foreground flex-shrink-0" />
                     <div>
-                      <h3 className="font-medium">Selfie Verification</h3>
+                      <h3 className="font-medium">Utility Bill</h3>
                       <p className="text-sm text-muted-foreground">
-                        Take a clear photo of yourself holding your ID document
+                        Upload a recent utility bill or bank statement showing your current address
                       </p>
                     </div>
                   </div>
