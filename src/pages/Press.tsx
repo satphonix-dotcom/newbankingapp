@@ -67,4 +67,34 @@ const Press = () => {
                         Read More →
                       </button>
                     </div>
-                  
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <h2 className="text-2xl font-semibold mb-6">Media Kit</h2>
+                <div className="space-y-4">
+                  {mediaKit.map((item, index) => (
+                    <div key={index} className="p-4 rounded-xl bg-surface border border-border">
+                      <h3 className="font-medium mb-1">{item.title}</h3>
+                      <div className="flex justify-between text-sm text-secondary">
+                        <span>{item.format}</span>
+                        <span>{item.size}</span>
+                      </div>
+                      <button className="mt-2 text-primary hover:text-accent transition-colors">
+                        Download →
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+      <Footer />
+    </div>
+  );
+};
+
+export default Press;
