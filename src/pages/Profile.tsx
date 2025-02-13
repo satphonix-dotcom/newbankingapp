@@ -241,7 +241,7 @@ const Profile = () => {
                             <SelectValue placeholder="Select country code" />
                           </SelectTrigger>
                         </FormControl>
-                        <SelectContent className="bg-white">
+                        <SelectContent className="bg-white max-h-[200px] overflow-y-auto">
                           {countryCodes.map((country) => (
                             <SelectItem
                               key={country.code}
