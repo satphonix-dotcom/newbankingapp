@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
@@ -91,6 +90,7 @@ const Profile = () => {
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const [uploadLoading, setUploadLoading] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
 
   const { data: session } = useQuery({
     queryKey: ["session"],
@@ -151,6 +151,11 @@ const Profile = () => {
       });
     }
   }, [profile, form]);
+
+  const filteredCountryCodes = countryCodes.filter(country => 
+    country.country.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    country.code.includes(searchQuery)
+  );
 
   const onSubmit = async (values: FormValues) => {
     if (!session?.user.id) return;
@@ -311,16 +316,26 @@ const Profile = () => {
                             <SelectValue placeholder="Select country code" />
                           </SelectTrigger>
                         </FormControl>
-                        <SelectContent className="bg-white max-h-[200px] overflow-y-auto">
-                          {countryCodes.map((country) => (
-                            <SelectItem
-                              key={country.code}
-                              value={country.code}
-                              className="hover:bg-gray-100"
-                            >
-                              {country.code} ({country.country})
-                            </SelectItem>
-                          ))}
+                        <SelectContent className="bg-white max-h-[200px]">
+                          <div className="p-2">
+                            <Input
+                              placeholder="Search country..."
+                              value={searchQuery}
+                              onChange={(e) => setSearchQuery(e.target.value)}
+                              className="mb-2"
+                            />
+                          </div>
+                          <div className="max-h-[150px] overflow-y-auto">
+                            {filteredCountryCodes.map((country) => (
+                              <SelectItem
+                                key={country.code}
+                                value={country.code}
+                                className="hover:bg-gray-100"
+                              >
+                                {country.code} ({country.country})
+                              </SelectItem>
+                            ))}
+                          </div>
                         </SelectContent>
                       </Select>
                     </FormItem>
