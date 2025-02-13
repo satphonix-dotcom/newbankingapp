@@ -160,12 +160,21 @@ const AdminUserPage = () => {
 
   const handleAddFunds = async (accountId: string, amount: number, currency: string) => {
     try {
-      const { error } = await supabase.rpc('add_funds', {
-        p_account_id: accountId,
-        p_amount: amount
-      });
+      const { data: account, error: fetchError } = await supabase
+        .from("accounts")
+        .select("balance")
+        .eq("id", accountId)
+        .single();
 
-      if (error) throw error;
+      if (fetchError) throw fetchError;
+
+      const newBalance = (account?.balance || 0) + amount;
+      const { error: updateError } = await supabase
+        .from("accounts")
+        .update({ balance: newBalance })
+        .eq("id", accountId);
+
+      if (updateError) throw updateError;
 
       toast({
         title: "Success",
