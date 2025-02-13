@@ -15,6 +15,7 @@ const AccountsList = ({ userId }: AccountsListProps) => {
   const { data: accounts, isLoading } = useQuery({
     queryKey: ["accounts", userId],
     queryFn: async () => {
+      console.log("Fetching accounts for user:", userId); // Add logging
       const { data, error } = await supabase
         .from("accounts")
         .select("*")
@@ -22,6 +23,7 @@ const AccountsList = ({ userId }: AccountsListProps) => {
         .order("created_at");
 
       if (error) {
+        console.error("Error fetching accounts:", error); // Add error logging
         toast({
           variant: "destructive",
           title: "Error",
@@ -30,6 +32,7 @@ const AccountsList = ({ userId }: AccountsListProps) => {
         return [];
       }
 
+      console.log("Fetched accounts:", data); // Add response logging
       return data;
     },
     enabled: !!userId,
@@ -67,6 +70,8 @@ const AccountsList = ({ userId }: AccountsListProps) => {
               {new Intl.NumberFormat("en-US", {
                 style: "currency",
                 currency: account.currency,
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
               }).format(account.balance)}
             </p>
             {account.interest_rate && (
