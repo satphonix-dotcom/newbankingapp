@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Loader2 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 interface AccountsListProps {
   userId: string;
@@ -11,6 +12,7 @@ interface AccountsListProps {
 
 const AccountsList = ({ userId }: AccountsListProps) => {
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   const { data: accounts, isLoading } = useQuery({
     queryKey: ["accounts", userId],
@@ -51,7 +53,11 @@ const AccountsList = ({ userId }: AccountsListProps) => {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
       {accounts?.map((account) => (
-        <Card key={account.id}>
+        <Card 
+          key={account.id}
+          className="cursor-pointer transition-all hover:shadow-lg"
+          onClick={() => navigate(`/account/${account.id}`)}
+        >
           <CardHeader>
             <CardTitle className="flex justify-between items-start">
               <div>

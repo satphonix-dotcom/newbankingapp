@@ -11,6 +11,7 @@ import About from "./pages/About";
 import GetStarted from "./pages/GetStarted";
 import SignIn from "./pages/SignIn";
 import Dashboard from "./pages/Dashboard";
+import AccountDetail from "./pages/AccountDetail";
 import AdminDashboard from "./pages/AdminDashboard";
 import AdminUserPage from "./pages/AdminUserPage";
 import Documentation from "./pages/Documentation";
@@ -51,6 +52,7 @@ const App = () => {
             <Route path="/get-started" element={<GetStarted />} />
             <Route path="/sign-in" element={<SignIn />} />
             <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/account/:id" element={<AccountDetail />} />
             <Route path="/admin-dashboard" element={<AdminDashboard />} />
             <Route path="/admin/users/:id" element={<AdminUserPage />} />
             <Route path="/documentation" element={<Documentation />} />
