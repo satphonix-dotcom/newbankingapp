@@ -11,6 +11,7 @@ export type Database = {
     Tables: {
       accounts: {
         Row: {
+          account_number: string | null
           account_type: Database["public"]["Enums"]["account_type"]
           balance: number
           created_at: string
@@ -25,6 +26,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          account_number?: string | null
           account_type: Database["public"]["Enums"]["account_type"]
           balance?: number
           created_at?: string
@@ -39,6 +41,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          account_number?: string | null
           account_type?: Database["public"]["Enums"]["account_type"]
           balance?: number
           created_at?: string
@@ -206,6 +209,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      generate_account_number: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
       has_role: {
         Args: {
           user_id: string

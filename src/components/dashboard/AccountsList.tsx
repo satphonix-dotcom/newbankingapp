@@ -15,7 +15,7 @@ const AccountsList = ({ userId }: AccountsListProps) => {
   const { data: accounts, isLoading } = useQuery({
     queryKey: ["accounts", userId],
     queryFn: async () => {
-      console.log("Fetching accounts for user:", userId); // Add logging
+      console.log("Fetching accounts for user:", userId);
       const { data, error } = await supabase
         .from("accounts")
         .select("*")
@@ -23,7 +23,7 @@ const AccountsList = ({ userId }: AccountsListProps) => {
         .order("created_at");
 
       if (error) {
-        console.error("Error fetching accounts:", error); // Add error logging
+        console.error("Error fetching accounts:", error);
         toast({
           variant: "destructive",
           title: "Error",
@@ -32,7 +32,7 @@ const AccountsList = ({ userId }: AccountsListProps) => {
         return [];
       }
 
-      console.log("Fetched accounts:", data); // Add response logging
+      console.log("Fetched accounts:", data);
       return data;
     },
     enabled: !!userId,
@@ -56,7 +56,10 @@ const AccountsList = ({ userId }: AccountsListProps) => {
             <CardTitle className="flex justify-between items-start">
               <div>
                 <span className="block text-lg">{account.name}</span>
-                <span className="text-sm text-muted-foreground capitalize">
+                <span className="text-sm text-muted-foreground">
+                  Account No: {account.account_number}
+                </span>
+                <span className="text-sm text-muted-foreground capitalize block">
                   {account.account_type}
                 </span>
               </div>
