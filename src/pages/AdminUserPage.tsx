@@ -176,6 +176,19 @@ const AdminUserPage = () => {
 
       if (updateError) throw updateError;
 
+      const { error: transactionError } = await supabase
+        .from("transactions")
+        .insert({
+          amount,
+          currency,
+          type: 'deposit',
+          status: 'completed',
+          to_account_id: accountId,
+          description: 'Funds added by admin'
+        });
+
+      if (transactionError) throw transactionError;
+
       toast({
         title: "Success",
         description: `Added ${new Intl.NumberFormat("en-US", {
@@ -183,7 +196,9 @@ const AdminUserPage = () => {
           currency: currency,
         }).format(amount)} to account`,
       });
+      
       queryClient.invalidateQueries({ queryKey: ["admin-user-accounts", id] });
+      queryClient.invalidateQueries({ queryKey: ["transactions"] });
     } catch (error) {
       toast({
         variant: "destructive",
