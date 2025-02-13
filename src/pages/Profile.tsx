@@ -1,103 +1,17 @@
-import { useState, useEffect } from "react";
+
 import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/components/ui/use-toast";
+import { Button } from "@/components/ui/button";
+import { ArrowLeft } from "lucide-react";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
-import { useForm } from "react-hook-form";
-import { Form, FormControl, FormField, FormItem, FormLabel } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Loader2, ArrowLeft } from "lucide-react";
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-
-interface FormValues {
-  first_name: string;
-  last_name: string;
-  phone_number: string;
-  country_code: string;
-  email: string;
-}
-
-interface PasswordFormValues {
-  password: string;
-  confirmPassword: string;
-}
-
-const countryCodes = [
-  { code: "+1", country: "US/Canada" },
-  { code: "+44", country: "UK" },
-  { code: "+33", country: "France" },
-  { code: "+49", country: "Germany" },
-  { code: "+81", country: "Japan" },
-  { code: "+86", country: "China" },
-  { code: "+91", country: "India" },
-  { code: "+61", country: "Australia" },
-  { code: "+55", country: "Brazil" },
-  { code: "+52", country: "Mexico" },
-  { code: "+34", country: "Spain" },
-  { code: "+39", country: "Italy" },
-  { code: "+7", country: "Russia" },
-  { code: "+82", country: "South Korea" },
-  { code: "+31", country: "Netherlands" },
-  { code: "+46", country: "Sweden" },
-  { code: "+47", country: "Norway" },
-  { code: "+45", country: "Denmark" },
-  { code: "+358", country: "Finland" },
-  { code: "+48", country: "Poland" },
-  { code: "+43", country: "Austria" },
-  { code: "+32", country: "Belgium" },
-  { code: "+41", country: "Switzerland" },
-  { code: "+351", country: "Portugal" },
-  { code: "+353", country: "Ireland" },
-  { code: "+30", country: "Greece" },
-  { code: "+36", country: "Hungary" },
-  { code: "+420", country: "Czech Republic" },
-  { code: "+421", country: "Slovakia" },
-  { code: "+40", country: "Romania" },
-  { code: "+359", country: "Bulgaria" },
-  { code: "+380", country: "Ukraine" },
-  { code: "+972", country: "Israel" },
-  { code: "+971", country: "UAE" },
-  { code: "+966", country: "Saudi Arabia" },
-  { code: "+20", country: "Egypt" },
-  { code: "+27", country: "South Africa" },
-  { code: "+234", country: "Nigeria" },
-  { code: "+254", country: "Kenya" },
-  { code: "+91", country: "India" },
-  { code: "+94", country: "Sri Lanka" },
-  { code: "+66", country: "Thailand" },
-  { code: "+84", country: "Vietnam" },
-  { code: "+62", country: "Indonesia" },
-  { code: "+60", country: "Malaysia" },
-  { code: "+63", country: "Philippines" },
-  { code: "+65", country: "Singapore" },
-  { code: "+64", country: "New Zealand" },
-  { code: "+56", country: "Chile" },
-  { code: "+57", country: "Colombia" },
-  { code: "+58", country: "Venezuela" },
-  { code: "+51", country: "Peru" },
-  { code: "+54", country: "Argentina" },
-  { code: "+598", country: "Uruguay" },
-  { code: "+506", country: "Costa Rica" },
-  { code: "+52", country: "Mexico" },
-];
+import ProfileAvatar from "@/components/profile/ProfileAvatar";
+import ProfileInfoForm from "@/components/profile/ProfileInfoForm";
+import PasswordChangeForm from "@/components/profile/PasswordChangeForm";
 
 const Profile = () => {
   const navigate = useNavigate();
-  const { toast } = useToast();
-  const [isLoading, setIsLoading] = useState(false);
-  const [uploadLoading, setUploadLoading] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [isPasswordLoading, setIsPasswordLoading] = useState(false);
 
   const { data: session } = useQuery({
     queryKey: ["session"],
@@ -127,160 +41,19 @@ const Profile = () => {
     enabled: !!session?.user.id,
   });
 
-  const form = useForm<FormValues>({
-    defaultValues: {
-      first_name: "",
-      last_name: "",
-      phone_number: "",
-      country_code: "",
-      email: "",
-    },
-  });
+  if (!profile || !session?.user.id) return null;
 
-  const passwordForm = useForm<PasswordFormValues>({
-    defaultValues: {
-      password: "",
-      confirmPassword: "",
-    },
-  });
+  const phoneNumber = profile.phone_number || "";
+  const countryCode = phoneNumber.match(/^\+\d+/)?.[0] || "+1";
+  const number = phoneNumber.replace(/^\+\d+\s*/, "");
 
-  useEffect(() => {
-    if (profile) {
-      const phoneNumber = profile.phone_number || "";
-      let countryCode = phoneNumber.match(/^\+\d+/)?.[0];
-      
-      if (!countryCode) {
-        countryCode = form.getValues().country_code || "+1";
-      }
-      
-      const number = phoneNumber.replace(/^\+\d+\s*/, "");
-
-      form.reset({
-        first_name: profile.first_name || "",
-        last_name: profile.last_name || "",
-        phone_number: number,
-        country_code: countryCode,
-        email: profile.email || "",
-      }, {
-        keepDefaultValues: true
-      });
-    }
-  }, [profile, form]);
-
-  const filteredCountryCodes = countryCodes.filter(country => 
-    country.country.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    country.code.includes(searchQuery)
-  );
-
-  const onSubmit = async (values: FormValues) => {
-    if (!session?.user.id) return;
-    setIsLoading(true);
-    try {
-      const { error } = await supabase
-        .from("profiles")
-        .update({
-          first_name: values.first_name,
-          last_name: values.last_name,
-          phone_number: `${values.country_code} ${values.phone_number}`,
-          email: values.email,
-        })
-        .eq("id", session.user.id);
-
-      if (error) throw error;
-
-      toast({
-        title: "Success",
-        description: "Profile updated successfully",
-      });
-      refetch();
-    } catch (error) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Failed to update profile",
-      });
-    } finally {
-      setIsLoading(false);
-    }
+  const initialFormData = {
+    first_name: profile.first_name || "",
+    last_name: profile.last_name || "",
+    phone_number: number,
+    country_code: countryCode,
+    email: profile.email || "",
   };
-
-  const onPasswordSubmit = async (values: PasswordFormValues) => {
-    if (values.password !== values.confirmPassword) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Passwords do not match",
-      });
-      return;
-    }
-
-    setIsPasswordLoading(true);
-    try {
-      const { error } = await supabase.auth.updateUser({
-        password: values.password
-      });
-
-      if (error) throw error;
-
-      toast({
-        title: "Success",
-        description: "Password updated successfully",
-      });
-      passwordForm.reset();
-    } catch (error) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Failed to update password",
-      });
-    } finally {
-      setIsPasswordLoading(false);
-    }
-  };
-
-  const handleAvatarUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file || !session?.user.id) return;
-
-    setUploadLoading(true);
-    try {
-      const fileExt = file.name.split('.').pop();
-      const filePath = `${session.user.id}-${Math.random()}.${fileExt}`;
-
-      const { error: uploadError } = await supabase.storage
-        .from('avatars')
-        .upload(filePath, file);
-
-      if (uploadError) throw uploadError;
-
-      const { data: { publicUrl } } = supabase.storage
-        .from('avatars')
-        .getPublicUrl(filePath);
-
-      const { error: updateError } = await supabase
-        .from('profiles')
-        .update({ avatar_url: publicUrl })
-        .eq('id', session.user.id);
-
-      if (updateError) throw updateError;
-
-      toast({
-        title: "Success",
-        description: "Avatar updated successfully",
-      });
-      refetch();
-    } catch (error) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Failed to upload avatar",
-      });
-    } finally {
-      setUploadLoading(false);
-    }
-  };
-
-  if (!profile) return null;
 
   return (
     <div className="min-h-screen bg-background">
@@ -303,166 +76,20 @@ const Profile = () => {
             </p>
           </div>
 
-          <div className="flex flex-col items-center space-y-4">
-            <Avatar className="h-24 w-24">
-              <AvatarImage src={profile.avatar_url || undefined} />
-              <AvatarFallback>
-                {profile.first_name?.[0]?.toUpperCase() || "U"}
-              </AvatarFallback>
-            </Avatar>
-            <div className="flex items-center gap-4">
-              <Input
-                type="file"
-                accept="image/*"
-                onChange={handleAvatarUpload}
-                disabled={uploadLoading}
-                className="w-auto"
-              />
-              {uploadLoading && <Loader2 className="h-4 w-4 animate-spin" />}
-            </div>
-          </div>
+          <ProfileAvatar
+            userId={session.user.id}
+            avatarUrl={profile.avatar_url}
+            firstName={profile.first_name}
+            onAvatarUpdate={refetch}
+          />
 
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-              <FormField
-                control={form.control}
-                name="email"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Email</FormLabel>
-                    <FormControl>
-                      <Input {...field} type="email" />
-                    </FormControl>
-                  </FormItem>
-                )}
-              />
+          <ProfileInfoForm
+            userId={session.user.id}
+            initialData={initialFormData}
+            onSuccess={refetch}
+          />
 
-              <FormField
-                control={form.control}
-                name="first_name"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>First Name</FormLabel>
-                    <FormControl>
-                      <Input {...field} />
-                    </FormControl>
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="last_name"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Last Name</FormLabel>
-                    <FormControl>
-                      <Input {...field} />
-                    </FormControl>
-                  </FormItem>
-                )}
-              />
-
-              <div className="grid grid-cols-3 gap-4">
-                <FormField
-                  control={form.control}
-                  name="country_code"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Country Code</FormLabel>
-                      <Select
-                        onValueChange={field.onChange}
-                        value={field.value || "+1"}
-                      >
-                        <FormControl>
-                          <SelectTrigger className="bg-white">
-                            <SelectValue placeholder="Select country code" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent className="bg-white max-h-[200px]">
-                          <div className="p-2">
-                            <Input
-                              placeholder="Search country..."
-                              value={searchQuery}
-                              onChange={(e) => setSearchQuery(e.target.value)}
-                              className="mb-2"
-                            />
-                          </div>
-                          <div className="max-h-[150px] overflow-y-auto">
-                            {filteredCountryCodes.map((country) => (
-                              <SelectItem
-                                key={country.code}
-                                value={country.code}
-                                className="hover:bg-gray-100"
-                              >
-                                {country.code} ({country.country})
-                              </SelectItem>
-                            ))}
-                          </div>
-                        </SelectContent>
-                      </Select>
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="phone_number"
-                  render={({ field }) => (
-                    <FormItem className="col-span-2">
-                      <FormLabel>Phone Number</FormLabel>
-                      <FormControl>
-                        <Input {...field} type="tel" />
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
-              </div>
-
-              <Button type="submit" disabled={isLoading}>
-                {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                Save Changes
-              </Button>
-            </form>
-          </Form>
-
-          <div className="border-t pt-8">
-            <h2 className="text-xl font-semibold mb-4">Change Password</h2>
-            <Form {...passwordForm}>
-              <form onSubmit={passwordForm.handleSubmit(onPasswordSubmit)} className="space-y-4">
-                <FormField
-                  control={passwordForm.control}
-                  name="password"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>New Password</FormLabel>
-                      <FormControl>
-                        <Input type="password" {...field} />
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={passwordForm.control}
-                  name="confirmPassword"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Confirm New Password</FormLabel>
-                      <FormControl>
-                        <Input type="password" {...field} />
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
-
-                <Button type="submit" disabled={isPasswordLoading}>
-                  {isPasswordLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                  Update Password
-                </Button>
-              </form>
-            </Form>
-          </div>
+          <PasswordChangeForm />
         </div>
       </main>
       <Footer />
