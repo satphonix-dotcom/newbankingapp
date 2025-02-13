@@ -12,12 +12,33 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Loader2, ArrowLeft } from "lucide-react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface FormValues {
   first_name: string;
   last_name: string;
   phone_number: string;
+  country_code: string;
 }
+
+const countryCodes = [
+  { code: "+1", country: "US/Canada" },
+  { code: "+44", country: "UK" },
+  { code: "+33", country: "France" },
+  { code: "+49", country: "Germany" },
+  { code: "+81", country: "Japan" },
+  { code: "+86", country: "China" },
+  { code: "+91", country: "India" },
+  { code: "+61", country: "Australia" },
+  { code: "+55", country: "Brazil" },
+  { code: "+52", country: "Mexico" },
+];
 
 const Profile = () => {
   const navigate = useNavigate();
@@ -57,7 +78,8 @@ const Profile = () => {
     defaultValues: {
       first_name: profile?.first_name || "",
       last_name: profile?.last_name || "",
-      phone_number: profile?.phone_number || "",
+      phone_number: profile?.phone_number?.replace(/^\+\d+\s*/, "") || "", // Remove country code if present
+      country_code: profile?.phone_number?.match(/^\+\d+/)?.[0] || "+1", // Extract country code or default to +1
     },
   });
 
@@ -70,7 +92,7 @@ const Profile = () => {
         .update({
           first_name: values.first_name,
           last_name: values.last_name,
-          phone_number: values.phone_number,
+          phone_number: `${values.country_code} ${values.phone_number}`,
         })
         .eq("id", session.user.id);
 
@@ -204,18 +226,50 @@ const Profile = () => {
                 )}
               />
 
-              <FormField
-                control={form.control}
-                name="phone_number"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Phone Number</FormLabel>
-                    <FormControl>
-                      <Input {...field} type="tel" />
-                    </FormControl>
-                  </FormItem>
-                )}
-              />
+              <div className="grid grid-cols-3 gap-4">
+                <FormField
+                  control={form.control}
+                  name="country_code"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Country Code</FormLabel>
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select country code" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {countryCodes.map((country) => (
+                            <SelectItem
+                              key={country.code}
+                              value={country.code}
+                            >
+                              {country.code} ({country.country})
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="phone_number"
+                  render={({ field }) => (
+                    <FormItem className="col-span-2">
+                      <FormLabel>Phone Number</FormLabel>
+                      <FormControl>
+                        <Input {...field} type="tel" />
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+              </div>
 
               <Button type="submit" disabled={isLoading}>
                 {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
