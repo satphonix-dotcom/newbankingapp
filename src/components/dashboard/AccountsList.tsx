@@ -63,6 +63,14 @@ const AccountsList = ({ userId }: AccountsListProps) => {
     }
   };
 
+  const formatDate = (date: string) => {
+    return new Date(date).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+  };
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
       {accounts?.map((account) => (
@@ -126,11 +134,31 @@ const AccountsList = ({ userId }: AccountsListProps) => {
                 </CardContent>
               </Card>
             </TooltipTrigger>
-            {account.is_restricted && (
-              <TooltipContent>
-                <p>This account is restricted and cannot be accessed</p>
-              </TooltipContent>
-            )}
+            <TooltipContent className="p-4 max-w-xs">
+              <div className="space-y-2">
+                <p className="font-semibold">Account Details</p>
+                <div className="text-sm space-y-1">
+                  <p><span className="text-muted-foreground">Created:</span> {formatDate(account.created_at)}</p>
+                  <p><span className="text-muted-foreground">Type:</span> {account.account_type}</p>
+                  <p><span className="text-muted-foreground">Currency:</span> {account.currency}</p>
+                  <p><span className="text-muted-foreground">Account Number:</span> {account.account_number}</p>
+                  {account.interest_rate && (
+                    <p><span className="text-muted-foreground">Interest Rate:</span> {account.interest_rate}%</p>
+                  )}
+                  {account.maturity_date && (
+                    <p><span className="text-muted-foreground">Maturity Date:</span> {formatDate(account.maturity_date)}</p>
+                  )}
+                  {account.is_restricted && (
+                    <p className="text-destructive">
+                      <span className="font-semibold">Restricted:</span> {account.restriction_reason || "Account restricted by admin"}
+                    </p>
+                  )}
+                  {!account.is_restricted && (
+                    <p className="text-sm text-muted-foreground italic mt-2">Click to view full details and transactions</p>
+                  )}
+                </div>
+              </div>
+            </TooltipContent>
           </Tooltip>
         </TooltipProvider>
       ))}
