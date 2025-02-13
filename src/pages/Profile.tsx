@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
@@ -238,15 +237,16 @@ const Profile = () => {
                         defaultValue={field.value}
                       >
                         <FormControl>
-                          <SelectTrigger>
+                          <SelectTrigger className="bg-white">
                             <SelectValue placeholder="Select country code" />
                           </SelectTrigger>
                         </FormControl>
-                        <SelectContent>
+                        <SelectContent className="bg-white">
                           {countryCodes.map((country) => (
                             <SelectItem
                               key={country.code}
                               value={country.code}
+                              className="hover:bg-gray-100"
                             >
                               {country.code} ({country.country})
                             </SelectItem>
