@@ -24,7 +24,7 @@ import Terms from "./pages/Terms";
 import Privacy from "./pages/Privacy";
 import Cookies from "./pages/Cookies";
 import KYC from "./pages/KYC";
-import "./App.css";
+import KYCSubmit from "./pages/KYCSubmit";
 
 function App() {
   return (
@@ -53,6 +53,7 @@ function App() {
       <Route path="/privacy" element={<Privacy />} />
       <Route path="/cookies" element={<Cookies />} />
       <Route path="/kyc" element={<KYC />} />
+      <Route path="/kyc/submit" element={<KYCSubmit />} />
     </Routes>
   );
 }
