@@ -1,16 +1,35 @@
 
 import { Button } from "./ui/button";
 import { Link, useNavigate } from "react-router-dom";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { Session } from "@supabase/supabase-js";
 
 const Navigation = () => {
   const navigate = useNavigate();
+  const [session, setSession] = useState<Session | null>(null);
 
   // Effect to scroll to top when route changes
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [navigate]);
+
+  // Effect to handle auth state
+  useEffect(() => {
+    // Get initial session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+    });
+
+    // Listen for auth changes
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
@@ -37,7 +56,7 @@ const Navigation = () => {
         </div>
 
         <div className="flex items-center space-x-4">
-          {supabase.auth.getSession() ? (
+          {session ? (
             <>
               <Link to="/dashboard">
                 <Button variant="ghost" className="hidden md:inline-flex">
