@@ -159,7 +159,7 @@ const AdminUserPage = () => {
     }
   };
 
-  const handleAddFunds = async (accountId: string, amount: number, currency: CurrencyType) => {
+  const handleAddFunds = async (accountId: string, amount: number, currency: CurrencyType, memo: string) => {
     try {
       const { data: account, error: fetchError } = await supabase
         .from("accounts")
@@ -185,7 +185,7 @@ const AdminUserPage = () => {
           type: 'deposit',
           status: 'completed',
           to_account_id: accountId,
-          description: 'Funds added by admin'
+          description: memo || 'Funds added by admin'
         });
 
       if (transactionError) throw transactionError;
@@ -209,7 +209,7 @@ const AdminUserPage = () => {
     }
   };
 
-  const handleDeductFunds = async (accountId: string, amount: number, currency: CurrencyType) => {
+  const handleDeductFunds = async (accountId: string, amount: number, currency: CurrencyType, memo: string) => {
     try {
       const { data: account, error: fetchError } = await supabase
         .from("accounts")
@@ -244,7 +244,7 @@ const AdminUserPage = () => {
           type: 'withdrawal',
           status: 'completed',
           from_account_id: accountId,
-          description: 'Funds deducted by admin'
+          description: memo || 'Funds deducted by admin'
         });
 
       if (transactionError) throw transactionError;
@@ -409,17 +409,26 @@ const AdminUserPage = () => {
                                 <AlertDialogHeader>
                                   <AlertDialogTitle>Add Funds</AlertDialogTitle>
                                   <AlertDialogDescription>
-                                    Enter the amount to add to this account.
+                                    Enter the amount and memo for this transaction.
                                   </AlertDialogDescription>
                                 </AlertDialogHeader>
-                                <div className="py-4">
-                                  <Input
-                                    type="number"
-                                    placeholder="Amount"
-                                    id={`amount-add-${account.id}`}
-                                    min="0"
-                                    step="0.01"
-                                  />
+                                <div className="space-y-4 py-4">
+                                  <div>
+                                    <Input
+                                      type="number"
+                                      placeholder="Amount"
+                                      id={`amount-add-${account.id}`}
+                                      min="0"
+                                      step="0.01"
+                                    />
+                                  </div>
+                                  <div>
+                                    <Input
+                                      type="text"
+                                      placeholder="Memo (optional)"
+                                      id={`memo-add-${account.id}`}
+                                    />
+                                  </div>
                                 </div>
                                 <AlertDialogFooter>
                                   <AlertDialogCancel>Cancel</AlertDialogCancel>
@@ -427,8 +436,9 @@ const AdminUserPage = () => {
                                     const amount = parseFloat(
                                       (document.getElementById(`amount-add-${account.id}`) as HTMLInputElement).value
                                     );
+                                    const memo = (document.getElementById(`memo-add-${account.id}`) as HTMLInputElement).value;
                                     if (!isNaN(amount) && amount > 0) {
-                                      handleAddFunds(account.id, amount, account.currency);
+                                      handleAddFunds(account.id, amount, account.currency, memo);
                                     }
                                   }}>
                                     Add Funds
@@ -447,18 +457,27 @@ const AdminUserPage = () => {
                                 <AlertDialogHeader>
                                   <AlertDialogTitle>Deduct Funds</AlertDialogTitle>
                                   <AlertDialogDescription>
-                                    Enter the amount to deduct from this account.
+                                    Enter the amount and memo for this transaction.
                                   </AlertDialogDescription>
                                 </AlertDialogHeader>
-                                <div className="py-4">
-                                  <Input
-                                    type="number"
-                                    placeholder="Amount"
-                                    id={`amount-deduct-${account.id}`}
-                                    min="0"
-                                    step="0.01"
-                                    max={account.balance}
-                                  />
+                                <div className="space-y-4 py-4">
+                                  <div>
+                                    <Input
+                                      type="number"
+                                      placeholder="Amount"
+                                      id={`amount-deduct-${account.id}`}
+                                      min="0"
+                                      step="0.01"
+                                      max={account.balance}
+                                    />
+                                  </div>
+                                  <div>
+                                    <Input
+                                      type="text"
+                                      placeholder="Memo (optional)"
+                                      id={`memo-deduct-${account.id}`}
+                                    />
+                                  </div>
                                 </div>
                                 <AlertDialogFooter>
                                   <AlertDialogCancel>Cancel</AlertDialogCancel>
@@ -466,8 +485,9 @@ const AdminUserPage = () => {
                                     const amount = parseFloat(
                                       (document.getElementById(`amount-deduct-${account.id}`) as HTMLInputElement).value
                                     );
+                                    const memo = (document.getElementById(`memo-deduct-${account.id}`) as HTMLInputElement).value;
                                     if (!isNaN(amount) && amount > 0) {
-                                      handleDeductFunds(account.id, amount, account.currency);
+                                      handleDeductFunds(account.id, amount, account.currency, memo);
                                     }
                                   }}>
                                     Deduct Funds
