@@ -25,6 +25,7 @@ import Terms from "./pages/Terms";
 import Security from "./pages/Security";
 import Cookies from "./pages/Cookies";
 import Profile from "./pages/Profile";
+import TransactionsDetail from "./pages/TransactionsDetail";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -64,6 +65,7 @@ const App = () => {
             <Route path="/security" element={<Security />} />
             <Route path="/cookies" element={<Cookies />} />
             <Route path="/profile" element={<Profile />} />
+            <Route path="/transactions" element={<TransactionsDetail />} />
           </Routes>
         </BrowserRouter>
       </TooltipProvider>
