@@ -39,6 +39,26 @@ const AdminUserPage = () => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
+  const { data: isAdmin, isLoading: isCheckingAdmin } = useQuery({
+    queryKey: ["admin-check"],
+    queryFn: async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.user?.id) return false;
+
+      const { data, error } = await supabase.rpc('has_role', {
+        user_id: session.user.id,
+        required_role: 'admin'
+      });
+
+      if (error) {
+        console.error("Error checking admin role:", error);
+        return false;
+      }
+
+      return data || false;
+    },
+  });
+
   const { data: user, isLoading: isUserLoading } = useQuery({
     queryKey: ["admin-user", id],
     queryFn: async () => {
@@ -49,6 +69,7 @@ const AdminUserPage = () => {
         .single();
 
       if (error) {
+        console.error("Error fetching user:", error);
         toast({
           variant: "destructive",
           title: "Error",
@@ -59,7 +80,7 @@ const AdminUserPage = () => {
 
       return data as UserProfile;
     },
-    enabled: !!id,
+    enabled: !!id && !!isAdmin,
   });
 
   const { data: accounts, isLoading: isAccountsLoading } = useQuery({
@@ -72,6 +93,7 @@ const AdminUserPage = () => {
         .order("created_at");
 
       if (error) {
+        console.error("Error fetching accounts:", error);
         toast({
           variant: "destructive",
           title: "Error",
@@ -82,7 +104,7 @@ const AdminUserPage = () => {
 
       return data;
     },
-    enabled: !!id,
+    enabled: !!id && !!isAdmin,
   });
 
   const handleRoleChange = async (newRole: UserRole) => {
@@ -267,6 +289,43 @@ const AdminUserPage = () => {
       });
     }
   };
+
+  if (isCheckingAdmin) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Navigation />
+        <main className="container mx-auto pt-24 px-4">
+          <div className="flex justify-center">
+            <Loader2 className="h-6 w-6 animate-spin" />
+          </div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+
+  if (!isAdmin) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Navigation />
+        <main className="container mx-auto pt-24 px-4">
+          <div className="text-center">
+            <h1 className="text-2xl font-bold text-destructive">Access Denied</h1>
+            <p className="mt-2 text-muted-foreground">You must be an admin to view this page.</p>
+            <Button
+              variant="ghost"
+              className="mt-4"
+              onClick={() => navigate("/dashboard")}
+            >
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Back to Dashboard
+            </Button>
+          </div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
 
   if (isUserLoading) {
     return (
