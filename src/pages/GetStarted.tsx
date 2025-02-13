@@ -16,7 +16,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { ArrowRight } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
 
 const formSchema = z.object({
   firstName: z.string().min(2, "First name must be at least 2 characters"),
@@ -27,6 +28,8 @@ const formSchema = z.object({
 
 const GetStarted = () => {
   const { toast } = useToast();
+  const navigate = useNavigate();
+  
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -37,12 +40,42 @@ const GetStarted = () => {
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    toast({
-      title: "Account creation initiated",
-      description: "We'll send you an email to verify your account.",
-    });
-    console.log(values);
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    try {
+      const { error } = await supabase.auth.signUp({
+        email: values.email,
+        password: values.password,
+        options: {
+          data: {
+            first_name: values.firstName,
+            last_name: values.lastName,
+          },
+        },
+      });
+
+      if (error) {
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: error.message,
+        });
+        return;
+      }
+
+      toast({
+        title: "Account created",
+        description: "Please check your email to verify your account.",
+      });
+      
+      // Redirect to sign-in page after successful signup
+      navigate("/sign-in");
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "An unexpected error occurred. Please try again.",
+      });
+    }
   }
 
   return (
