@@ -1,4 +1,3 @@
-
 import { useNavigate, useParams } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -17,6 +16,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import ProfileEditForm from "@/components/admin/ProfileEditForm";
+import { Switch } from "@/components/ui/switch";
+import { AlertDialog, AlertDialogTrigger, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from "@/components/ui/alert-dialog";
+import { Input } from "@/components/ui/input";
 
 type UserRole = "admin" | "user";
 
@@ -129,6 +131,59 @@ const AdminUserPage = () => {
     queryClient.invalidateQueries({ queryKey: ["admin-user", id] });
   };
 
+  const handleAccountUpdate = async (accountId: string, changes: {
+    is_restricted?: boolean;
+    restriction_reason?: string;
+    balance?: number;
+  }) => {
+    try {
+      const { error } = await supabase
+        .from("accounts")
+        .update(changes)
+        .eq("id", accountId);
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: "Account updated successfully",
+      });
+      queryClient.invalidateQueries({ queryKey: ["admin-user-accounts", id] });
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to update account",
+      });
+    }
+  };
+
+  const handleAddFunds = async (accountId: string, amount: number, currency: string) => {
+    try {
+      const { error } = await supabase.rpc('add_funds', {
+        p_account_id: accountId,
+        p_amount: amount
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: `Added ${new Intl.NumberFormat("en-US", {
+          style: "currency",
+          currency: currency,
+        }).format(amount)} to account`,
+      });
+      queryClient.invalidateQueries({ queryKey: ["admin-user-accounts", id] });
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to add funds",
+      });
+    }
+  };
+
   if (isUserLoading) {
     return (
       <div className="min-h-screen bg-background">
@@ -231,6 +286,8 @@ const AdminUserPage = () => {
                       <TableHead>Type</TableHead>
                       <TableHead>Currency</TableHead>
                       <TableHead>Balance</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead>Actions</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -246,6 +303,54 @@ const AdminUserPage = () => {
                             style: "currency",
                             currency: account.currency,
                           }).format(account.balance)}
+                        </TableCell>
+                        <TableCell>
+                          <Switch
+                            checked={!account.is_restricted}
+                            onCheckedChange={(checked) => handleAccountUpdate(account.id, {
+                              is_restricted: !checked,
+                              restriction_reason: !checked ? "Restricted by admin" : ""
+                            })}
+                          />
+                        </TableCell>
+                        <TableCell>
+                          <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                              <Button variant="outline" size="sm">
+                                Add Funds
+                              </Button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                              <AlertDialogHeader>
+                                <AlertDialogTitle>Add Funds</AlertDialogTitle>
+                                <AlertDialogDescription>
+                                  Enter the amount to add to this account.
+                                </AlertDialogDescription>
+                              </AlertDialogHeader>
+                              <div className="py-4">
+                                <Input
+                                  type="number"
+                                  placeholder="Amount"
+                                  id={`amount-${account.id}`}
+                                  min="0"
+                                  step="0.01"
+                                />
+                              </div>
+                              <AlertDialogFooter>
+                                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                <AlertDialogAction onClick={() => {
+                                  const amount = parseFloat(
+                                    (document.getElementById(`amount-${account.id}`) as HTMLInputElement).value
+                                  );
+                                  if (!isNaN(amount) && amount > 0) {
+                                    handleAddFunds(account.id, amount, account.currency);
+                                  }
+                                }}>
+                                  Add Funds
+                                </AlertDialogAction>
+                              </AlertDialogFooter>
+                            </AlertDialogContent>
+                          </AlertDialog>
                         </TableCell>
                       </TableRow>
                     ))}

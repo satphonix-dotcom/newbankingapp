@@ -17,8 +17,10 @@ export type Database = {
           currency: Database["public"]["Enums"]["currency_type"]
           id: string
           interest_rate: number | null
+          is_restricted: boolean | null
           maturity_date: string | null
           name: string
+          restriction_reason: string | null
           updated_at: string
           user_id: string
         }
@@ -29,8 +31,10 @@ export type Database = {
           currency: Database["public"]["Enums"]["currency_type"]
           id?: string
           interest_rate?: number | null
+          is_restricted?: boolean | null
           maturity_date?: string | null
           name: string
+          restriction_reason?: string | null
           updated_at?: string
           user_id: string
         }
@@ -41,8 +45,10 @@ export type Database = {
           currency?: Database["public"]["Enums"]["currency_type"]
           id?: string
           interest_rate?: number | null
+          is_restricted?: boolean | null
           maturity_date?: string | null
           name?: string
+          restriction_reason?: string | null
           updated_at?: string
           user_id?: string
         }
@@ -59,28 +65,34 @@ export type Database = {
       profiles: {
         Row: {
           avatar_url: string | null
+          blocked_reason: string | null
           created_at: string
           email: string | null
           first_name: string | null
           id: string
+          is_blocked: boolean | null
           last_name: string | null
           phone_number: string | null
         }
         Insert: {
           avatar_url?: string | null
+          blocked_reason?: string | null
           created_at?: string
           email?: string | null
           first_name?: string | null
           id: string
+          is_blocked?: boolean | null
           last_name?: string | null
           phone_number?: string | null
         }
         Update: {
           avatar_url?: string | null
+          blocked_reason?: string | null
           created_at?: string
           email?: string | null
           first_name?: string | null
           id?: string
+          is_blocked?: boolean | null
           last_name?: string | null
           phone_number?: string | null
         }
