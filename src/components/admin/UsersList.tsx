@@ -16,7 +16,7 @@ interface UserProfile {
   first_name: string | null;
   last_name: string | null;
   created_at: string;
-  user_roles?: { role: UserRole }[];
+  user_roles: { role: UserRole }[] | null;
 }
 
 const UsersList = () => {
@@ -26,17 +26,10 @@ const UsersList = () => {
   const { data: users, isLoading } = useQuery({
     queryKey: ["admin-users"],
     queryFn: async () => {
-      const { data: profiles, error } = await supabase
+      const { data, error } = await supabase
         .from("profiles")
-        .select(`
-          id,
-          first_name,
-          last_name,
-          created_at,
-          user_roles:user_roles (
-            role
-          )
-        `);
+        .select("*, user_roles(role)")
+        .returns<UserProfile[]>();
 
       if (error) {
         toast({
@@ -47,7 +40,7 @@ const UsersList = () => {
         return [];
       }
 
-      return profiles as UserProfile[];
+      return data;
     },
   });
 
