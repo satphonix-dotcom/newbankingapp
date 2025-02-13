@@ -29,8 +29,11 @@ const UsersList = () => {
       const { data: profiles, error } = await supabase
         .from("profiles")
         .select(`
-          *,
-          user_roles (
+          id,
+          first_name,
+          last_name,
+          created_at,
+          user_roles:user_roles (
             role
           )
         `);
