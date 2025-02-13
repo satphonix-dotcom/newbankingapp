@@ -1,3 +1,4 @@
+
 import { Button } from "./ui/button";
 import { Link } from "react-router-dom";
 
@@ -25,9 +26,11 @@ const Navigation = () => {
           <Button variant="ghost" className="hidden md:inline-flex">
             Sign In
           </Button>
-          <Button className="text-white">
-            Get Started
-          </Button>
+          <Link to="/get-started">
+            <Button className="text-white">
+              Get Started
+            </Button>
+          </Link>
         </div>
       </div>
     </nav>
