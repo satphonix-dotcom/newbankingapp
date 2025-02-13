@@ -31,6 +31,8 @@ export const useTransferFunds = (fromAccount: any, onSuccess: () => void) => {
 
   const onSubmit = async (values: TransferFormData) => {
     const amount = Number(values.amount);
+    
+    // Validate amount against balance
     if (amount > fromAccount.balance) {
       toast({
         variant: "destructive",
@@ -41,17 +43,41 @@ export const useTransferFunds = (fromAccount: any, onSuccess: () => void) => {
     }
 
     try {
-      const { error: transactionError } = await supabase.from("transactions").insert({
-        from_account_id: fromAccount.id,
-        to_account_id: values.toAccountId,
-        amount,
-        type: "transfer",
-        currency: fromAccount.currency,
-        description: values.description || "Fund transfer",
-      });
+      // First, fetch the destination account to verify currency compatibility
+      const { data: toAccount, error: accountError } = await supabase
+        .from("accounts")
+        .select("currency")
+        .eq("id", values.toAccountId)
+        .single();
+
+      if (accountError) throw accountError;
+
+      // Validate currencies match
+      if (toAccount.currency !== fromAccount.currency) {
+        toast({
+          variant: "destructive",
+          title: "Currency mismatch",
+          description: "You can only transfer between accounts with the same currency",
+        });
+        return;
+      }
+
+      // Create transaction record
+      const { error: transactionError } = await supabase
+        .from("transactions")
+        .insert({
+          from_account_id: fromAccount.id,
+          to_account_id: values.toAccountId,
+          amount,
+          type: "transfer",
+          currency: fromAccount.currency,
+          description: values.description || "Fund transfer",
+          status: "completed"
+        });
 
       if (transactionError) throw transactionError;
 
+      // Process the transfer
       const { error: transferError } = await supabase.rpc('process_transfer', {
         p_from_account_id: fromAccount.id,
         p_to_account_id: values.toAccountId,
@@ -65,9 +91,12 @@ export const useTransferFunds = (fromAccount: any, onSuccess: () => void) => {
         description: "Transfer completed successfully",
       });
 
+      // Invalidate relevant queries to refresh data
       await queryClient.invalidateQueries({ queryKey: ["accounts"] });
-      await queryClient.invalidateQueries({ queryKey: ["account"] });
       await queryClient.invalidateQueries({ queryKey: ["transactions"] });
+      await queryClient.invalidateQueries({ 
+        queryKey: ["account", fromAccount.id]
+      });
 
       form.reset();
       onSuccess();
@@ -76,7 +105,7 @@ export const useTransferFunds = (fromAccount: any, onSuccess: () => void) => {
       toast({
         variant: "destructive",
         title: "Error",
-        description: "Failed to complete the transfer",
+        description: "Failed to complete the transfer. Please try again.",
       });
     }
   };
