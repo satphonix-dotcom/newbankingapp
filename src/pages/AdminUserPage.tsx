@@ -21,6 +21,7 @@ import { AlertDialog, AlertDialogTrigger, AlertDialogContent, AlertDialogHeader,
 import { Input } from "@/components/ui/input";
 
 type UserRole = "admin" | "user";
+type CurrencyType = "USD" | "GBP" | "EUR" | "CNY";
 
 interface UserProfile {
   id: string;
@@ -158,7 +159,7 @@ const AdminUserPage = () => {
     }
   };
 
-  const handleAddFunds = async (accountId: string, amount: number, currency: string) => {
+  const handleAddFunds = async (accountId: string, amount: number, currency: CurrencyType) => {
     try {
       const { data: account, error: fetchError } = await supabase
         .from("accounts")
