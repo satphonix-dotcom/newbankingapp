@@ -209,6 +209,65 @@ const AdminUserPage = () => {
     }
   };
 
+  const handleDeductFunds = async (accountId: string, amount: number, currency: CurrencyType) => {
+    try {
+      const { data: account, error: fetchError } = await supabase
+        .from("accounts")
+        .select("balance")
+        .eq("id", accountId)
+        .single();
+
+      if (fetchError) throw fetchError;
+
+      if ((account?.balance || 0) < amount) {
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "Insufficient funds in the account",
+        });
+        return;
+      }
+
+      const newBalance = (account?.balance || 0) - amount;
+      const { error: updateError } = await supabase
+        .from("accounts")
+        .update({ balance: newBalance })
+        .eq("id", accountId);
+
+      if (updateError) throw updateError;
+
+      const { error: transactionError } = await supabase
+        .from("transactions")
+        .insert({
+          amount,
+          currency,
+          type: 'withdrawal',
+          status: 'completed',
+          from_account_id: accountId,
+          description: 'Funds deducted by admin'
+        });
+
+      if (transactionError) throw transactionError;
+
+      toast({
+        title: "Success",
+        description: `Deducted ${new Intl.NumberFormat("en-US", {
+          style: "currency",
+          currency: currency,
+        }).format(amount)} from account`,
+      });
+      
+      queryClient.invalidateQueries({ queryKey: ["admin-user-accounts", id] });
+      queryClient.invalidateQueries({ queryKey: ["transactions"] });
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to deduct funds",
+      });
+    }
+  };
+
   if (isUserLoading) {
     return (
       <div className="min-h-screen bg-background">
@@ -339,43 +398,84 @@ const AdminUserPage = () => {
                           />
                         </TableCell>
                         <TableCell>
-                          <AlertDialog>
-                            <AlertDialogTrigger asChild>
-                              <Button variant="outline" size="sm">
-                                Add Funds
-                              </Button>
-                            </AlertDialogTrigger>
-                            <AlertDialogContent>
-                              <AlertDialogHeader>
-                                <AlertDialogTitle>Add Funds</AlertDialogTitle>
-                                <AlertDialogDescription>
-                                  Enter the amount to add to this account.
-                                </AlertDialogDescription>
-                              </AlertDialogHeader>
-                              <div className="py-4">
-                                <Input
-                                  type="number"
-                                  placeholder="Amount"
-                                  id={`amount-${account.id}`}
-                                  min="0"
-                                  step="0.01"
-                                />
-                              </div>
-                              <AlertDialogFooter>
-                                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                <AlertDialogAction onClick={() => {
-                                  const amount = parseFloat(
-                                    (document.getElementById(`amount-${account.id}`) as HTMLInputElement).value
-                                  );
-                                  if (!isNaN(amount) && amount > 0) {
-                                    handleAddFunds(account.id, amount, account.currency);
-                                  }
-                                }}>
+                          <div className="space-x-2">
+                            <AlertDialog>
+                              <AlertDialogTrigger asChild>
+                                <Button variant="outline" size="sm">
                                   Add Funds
-                                </AlertDialogAction>
-                              </AlertDialogFooter>
-                            </AlertDialogContent>
-                          </AlertDialog>
+                                </Button>
+                              </AlertDialogTrigger>
+                              <AlertDialogContent>
+                                <AlertDialogHeader>
+                                  <AlertDialogTitle>Add Funds</AlertDialogTitle>
+                                  <AlertDialogDescription>
+                                    Enter the amount to add to this account.
+                                  </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <div className="py-4">
+                                  <Input
+                                    type="number"
+                                    placeholder="Amount"
+                                    id={`amount-add-${account.id}`}
+                                    min="0"
+                                    step="0.01"
+                                  />
+                                </div>
+                                <AlertDialogFooter>
+                                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                  <AlertDialogAction onClick={() => {
+                                    const amount = parseFloat(
+                                      (document.getElementById(`amount-add-${account.id}`) as HTMLInputElement).value
+                                    );
+                                    if (!isNaN(amount) && amount > 0) {
+                                      handleAddFunds(account.id, amount, account.currency);
+                                    }
+                                  }}>
+                                    Add Funds
+                                  </AlertDialogAction>
+                                </AlertDialogFooter>
+                              </AlertDialogContent>
+                            </AlertDialog>
+
+                            <AlertDialog>
+                              <AlertDialogTrigger asChild>
+                                <Button variant="outline" size="sm" className="bg-destructive/10 hover:bg-destructive/20">
+                                  Deduct Funds
+                                </Button>
+                              </AlertDialogTrigger>
+                              <AlertDialogContent>
+                                <AlertDialogHeader>
+                                  <AlertDialogTitle>Deduct Funds</AlertDialogTitle>
+                                  <AlertDialogDescription>
+                                    Enter the amount to deduct from this account.
+                                  </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <div className="py-4">
+                                  <Input
+                                    type="number"
+                                    placeholder="Amount"
+                                    id={`amount-deduct-${account.id}`}
+                                    min="0"
+                                    step="0.01"
+                                    max={account.balance}
+                                  />
+                                </div>
+                                <AlertDialogFooter>
+                                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                  <AlertDialogAction onClick={() => {
+                                    const amount = parseFloat(
+                                      (document.getElementById(`amount-deduct-${account.id}`) as HTMLInputElement).value
+                                    );
+                                    if (!isNaN(amount) && amount > 0) {
+                                      handleDeductFunds(account.id, amount, account.currency);
+                                    }
+                                  }}>
+                                    Deduct Funds
+                                  </AlertDialogAction>
+                                </AlertDialogFooter>
+                              </AlertDialogContent>
+                            </AlertDialog>
+                          </div>
                         </TableCell>
                       </TableRow>
                     ))}
