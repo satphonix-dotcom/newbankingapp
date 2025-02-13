@@ -1,5 +1,5 @@
 
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import {
@@ -18,6 +18,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import ProfileEditForm from "./ProfileEditForm";
 
 type UserRole = "admin" | "user";
 
@@ -26,7 +27,9 @@ interface UserProfile {
   first_name: string | null;
   last_name: string | null;
   created_at: string;
-  user_roles?: { role: UserRole }[];
+  phone_number?: string | null;
+  avatar_url?: string | null;
+  user_roles: { role: UserRole }[] | null;
 }
 
 interface UserDetailsDialogProps {
@@ -37,6 +40,7 @@ interface UserDetailsDialogProps {
 
 const UserDetailsDialog = ({ user, open, onOpenChange }: UserDetailsDialogProps) => {
   const { toast } = useToast();
+  const queryClient = useQueryClient();
 
   const { data: accounts, isLoading } = useQuery({
     queryKey: ["admin-user-accounts", user?.id],
@@ -99,6 +103,11 @@ const UserDetailsDialog = ({ user, open, onOpenChange }: UserDetailsDialogProps)
     });
   };
 
+  const handleProfileUpdate = () => {
+    // Refresh the users list
+    queryClient.invalidateQueries({ queryKey: ["admin-users"] });
+  };
+
   if (!user) return null;
 
   return (
@@ -111,26 +120,30 @@ const UserDetailsDialog = ({ user, open, onOpenChange }: UserDetailsDialogProps)
         <div className="grid gap-4">
           <Card>
             <CardHeader>
-              <CardTitle className="text-lg">User Information</CardTitle>
+              <CardTitle className="text-lg">Profile Information</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="grid gap-4">
-                <div>
-                  <label className="text-sm font-medium">Role</label>
-                  <Select
-                    value={user.user_roles?.[0]?.role || "user"}
-                    onValueChange={handleRoleChange}
-                  >
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="user">User</SelectItem>
-                      <SelectItem value="admin">Admin</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
+              <ProfileEditForm user={user} onSuccess={handleProfileUpdate} />
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg">User Role</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <Select
+                value={user.user_roles?.[0]?.role || "user"}
+                onValueChange={handleRoleChange}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="user">User</SelectItem>
+                  <SelectItem value="admin">Admin</SelectItem>
+                </SelectContent>
+              </Select>
             </CardContent>
           </Card>
 

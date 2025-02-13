@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import UserDetailsDialog from "./UserDetailsDialog";
 
 type UserRole = "admin" | "user";
@@ -16,6 +17,8 @@ interface UserProfile {
   first_name: string | null;
   last_name: string | null;
   created_at: string;
+  phone_number?: string | null;
+  avatar_url?: string | null;
   user_roles: { role: UserRole }[] | null;
 }
 
@@ -64,8 +67,9 @@ const UsersList = () => {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Name</TableHead>
+                <TableHead>User</TableHead>
                 <TableHead>Role</TableHead>
+                <TableHead>Phone</TableHead>
                 <TableHead>Created At</TableHead>
                 <TableHead>Actions</TableHead>
               </TableRow>
@@ -74,11 +78,22 @@ const UsersList = () => {
               {users?.map((user) => (
                 <TableRow key={user.id}>
                   <TableCell>
-                    {user.first_name} {user.last_name}
+                    <div className="flex items-center gap-3">
+                      <Avatar>
+                        <AvatarImage src={user.avatar_url || undefined} />
+                        <AvatarFallback>
+                          {user.first_name?.[0]?.toUpperCase() || "U"}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div>
+                        <div>{user.first_name} {user.last_name}</div>
+                      </div>
+                    </div>
                   </TableCell>
                   <TableCell className="capitalize">
                     {user.user_roles?.[0]?.role || "user"}
                   </TableCell>
+                  <TableCell>{user.phone_number || "-"}</TableCell>
                   <TableCell>
                     {new Date(user.created_at).toLocaleDateString()}
                   </TableCell>
