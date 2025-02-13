@@ -3,8 +3,15 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Loader2 } from "lucide-react";
+import { Loader2, AlertTriangle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { cn } from "@/lib/utils";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 interface AccountsListProps {
   userId: string;
@@ -50,51 +57,82 @@ const AccountsList = ({ userId }: AccountsListProps) => {
     );
   }
 
+  const handleAccountClick = (account: any) => {
+    if (!account.is_restricted) {
+      navigate(`/account/${account.id}`);
+    }
+  };
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
       {accounts?.map((account) => (
-        <Card 
-          key={account.id}
-          className="cursor-pointer transition-all hover:shadow-lg"
-          onClick={() => navigate(`/account/${account.id}`)}
-        >
-          <CardHeader>
-            <CardTitle className="flex justify-between items-start">
-              <div>
-                <span className="block text-lg">{account.name}</span>
-                <span className="text-sm text-muted-foreground">
-                  Account No: {account.account_number}
-                </span>
-                <span className="text-sm text-muted-foreground capitalize block">
-                  {account.account_type}
-                </span>
-              </div>
-              <span className="text-sm text-muted-foreground">
-                {account.currency}
-              </span>
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-2xl font-bold">
-              {new Intl.NumberFormat("en-US", {
-                style: "currency",
-                currency: account.currency,
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2,
-              }).format(account.balance)}
-            </p>
-            {account.interest_rate && (
-              <p className="text-sm text-muted-foreground mt-2">
-                Interest Rate: {account.interest_rate}%
-              </p>
+        <TooltipProvider key={account.id}>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Card 
+                className={cn(
+                  "transition-all",
+                  account.is_restricted 
+                    ? "opacity-75 cursor-not-allowed bg-gray-50" 
+                    : "cursor-pointer hover:shadow-lg"
+                )}
+                onClick={() => handleAccountClick(account)}
+              >
+                <CardHeader>
+                  <CardTitle className="flex justify-between items-start">
+                    <div>
+                      <span className="block text-lg">{account.name}</span>
+                      <span className="text-sm text-muted-foreground">
+                        Account No: {account.account_number}
+                      </span>
+                      <span className="text-sm text-muted-foreground capitalize block">
+                        {account.account_type}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      {account.is_restricted && (
+                        <AlertTriangle className="h-5 w-5 text-destructive" />
+                      )}
+                      <span className="text-sm text-muted-foreground">
+                        {account.currency}
+                      </span>
+                    </div>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-2xl font-bold">
+                    {new Intl.NumberFormat("en-US", {
+                      style: "currency",
+                      currency: account.currency,
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    }).format(account.balance)}
+                  </p>
+                  {account.interest_rate && (
+                    <p className="text-sm text-muted-foreground mt-2">
+                      Interest Rate: {account.interest_rate}%
+                    </p>
+                  )}
+                  {account.maturity_date && (
+                    <p className="text-sm text-muted-foreground">
+                      Matures: {new Date(account.maturity_date).toLocaleDateString()}
+                    </p>
+                  )}
+                  {account.is_restricted && (
+                    <div className="mt-2 p-2 bg-destructive/10 text-destructive rounded-md text-sm">
+                      Restricted: {account.restriction_reason || "Account restricted by admin"}
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </TooltipTrigger>
+            {account.is_restricted && (
+              <TooltipContent>
+                <p>This account is restricted and cannot be accessed</p>
+              </TooltipContent>
             )}
-            {account.maturity_date && (
-              <p className="text-sm text-muted-foreground">
-                Matures: {new Date(account.maturity_date).toLocaleDateString()}
-              </p>
-            )}
-          </CardContent>
-        </Card>
+          </Tooltip>
+        </TooltipProvider>
       ))}
     </div>
   );
