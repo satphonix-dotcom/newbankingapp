@@ -9,34 +9,46 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      account_balances: {
+      accounts: {
         Row: {
+          account_type: Database["public"]["Enums"]["account_type"]
           balance: number
           created_at: string
-          currency: string
+          currency: Database["public"]["Enums"]["currency_type"]
           id: string
+          interest_rate: number | null
+          maturity_date: string | null
+          name: string
           updated_at: string
           user_id: string
         }
         Insert: {
+          account_type: Database["public"]["Enums"]["account_type"]
           balance?: number
           created_at?: string
-          currency?: string
+          currency: Database["public"]["Enums"]["currency_type"]
           id?: string
+          interest_rate?: number | null
+          maturity_date?: string | null
+          name: string
           updated_at?: string
           user_id: string
         }
         Update: {
+          account_type?: Database["public"]["Enums"]["account_type"]
           balance?: number
           created_at?: string
-          currency?: string
+          currency?: Database["public"]["Enums"]["currency_type"]
           id?: string
+          interest_rate?: number | null
+          maturity_date?: string | null
+          name?: string
           updated_at?: string
           user_id?: string
         }
         Relationships: [
           {
-            foreignKeyName: "account_balances_user_id_fkey"
+            foreignKeyName: "accounts_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "profiles"
@@ -69,40 +81,53 @@ export type Database = {
         Row: {
           amount: number
           created_at: string
-          currency: string
+          currency: Database["public"]["Enums"]["currency_type"]
           description: string | null
+          from_account_id: string | null
           id: string
           recipient_id: string | null
           sender_id: string | null
           status: string
+          to_account_id: string | null
           type: string
           updated_at: string
         }
         Insert: {
           amount: number
           created_at?: string
-          currency?: string
+          currency?: Database["public"]["Enums"]["currency_type"]
           description?: string | null
+          from_account_id?: string | null
           id?: string
           recipient_id?: string | null
           sender_id?: string | null
           status?: string
+          to_account_id?: string | null
           type: string
           updated_at?: string
         }
         Update: {
           amount?: number
           created_at?: string
-          currency?: string
+          currency?: Database["public"]["Enums"]["currency_type"]
           description?: string | null
+          from_account_id?: string | null
           id?: string
           recipient_id?: string | null
           sender_id?: string | null
           status?: string
+          to_account_id?: string | null
           type?: string
           updated_at?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "transactions_from_account_id_fkey"
+            columns: ["from_account_id"]
+            isOneToOne: false
+            referencedRelation: "accounts"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "transactions_recipient_id_fkey"
             columns: ["recipient_id"]
@@ -117,6 +142,13 @@ export type Database = {
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "transactions_to_account_id_fkey"
+            columns: ["to_account_id"]
+            isOneToOne: false
+            referencedRelation: "accounts"
+            referencedColumns: ["id"]
+          },
         ]
       }
     }
@@ -127,7 +159,8 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      account_type: "current" | "savings" | "investment" | "fixed"
+      currency_type: "USD" | "GBP" | "EUR" | "CNY"
     }
     CompositeTypes: {
       [_ in never]: never
