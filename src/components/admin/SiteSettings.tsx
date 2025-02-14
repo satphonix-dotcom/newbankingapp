@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useSiteSettings } from "@/hooks/useSiteSettings";
 import { Button } from "@/components/ui/button";
-import { Loader2, Upload } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { useState } from "react";
 
 export const SiteSettings = () => {
@@ -39,11 +39,13 @@ export const SiteSettings = () => {
         <div className="space-y-4">
           <Label>Logo</Label>
           <div className="flex items-center gap-4">
-            <img 
-              src={settings?.logoUrl} 
-              alt="Site logo" 
-              className="h-12 w-auto object-contain bg-accent/10 rounded-lg p-2"
-            />
+            {settings?.logoUrl && (
+              <img 
+                src={settings.logoUrl} 
+                alt="Site logo" 
+                className="h-12 w-auto object-contain bg-accent/10 rounded-lg p-2"
+              />
+            )}
             <div className="flex-1">
               <Input
                 type="file"
@@ -60,8 +62,9 @@ export const SiteSettings = () => {
           <Label htmlFor="bankName">Bank Name</Label>
           <Input
             id="bankName"
-            value={settings?.bankName}
+            value={settings?.bankName || ""}
             onChange={(e) => updateSetting("bankName", e.target.value)}
+            placeholder="Enter bank name"
           />
         </div>
         <div className="space-y-2">
@@ -69,32 +72,36 @@ export const SiteSettings = () => {
           <Input
             id="contactEmail"
             type="email"
-            value={settings?.contactEmail}
+            value={settings?.contactEmail || ""}
             onChange={(e) => updateSetting("contactEmail", e.target.value)}
+            placeholder="contact@example.com"
           />
         </div>
         <div className="space-y-2">
           <Label htmlFor="contactPhone">Contact Phone</Label>
           <Input
             id="contactPhone"
-            value={settings?.contactPhone}
+            value={settings?.contactPhone || ""}
             onChange={(e) => updateSetting("contactPhone", e.target.value)}
+            placeholder="+1 (555) 000-0000"
           />
         </div>
         <div className="space-y-2">
           <Label htmlFor="contactAddress">Contact Address</Label>
           <Input
             id="contactAddress"
-            value={settings?.contactAddress}
+            value={settings?.contactAddress || ""}
             onChange={(e) => updateSetting("contactAddress", e.target.value)}
+            placeholder="123 Main St, City, Country"
           />
         </div>
         <div className="space-y-2">
           <Label htmlFor="footerCopyright">Footer Copyright Text</Label>
           <Input
             id="footerCopyright"
-            value={settings?.footerCopyright}
+            value={settings?.footerCopyright || ""}
             onChange={(e) => updateSetting("footerCopyright", e.target.value)}
+            placeholder="© 2024 Your Bank Name. All rights reserved."
           />
         </div>
       </CardContent>

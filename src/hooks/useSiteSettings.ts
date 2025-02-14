@@ -38,11 +38,17 @@ export const useSiteSettings = () => {
   });
 
   const updateSetting = useMutation({
-    mutationFn: async ({ key, value }: { key: keyof SiteSettings; value: string }) => {
+    mutationFn: async (variables: { key: keyof SiteSettings; value: string }) => {
+      const { key, value } = variables;
       const { error } = await supabase
         .from("site_settings")
-        .update({ value, updated_by: (await supabase.auth.getUser()).data.user?.id })
-        .eq("key", key);
+        .upsert({ 
+          key,
+          value,
+          updated_by: (await supabase.auth.getUser()).data.user?.id
+        }, {
+          onConflict: 'key'
+        });
 
       if (error) throw error;
     },
