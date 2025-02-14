@@ -64,20 +64,28 @@ const AdminKYCPage = () => {
 
       // Get signed URLs for the documents with 24 hour expiry
       if (data.govt_id_url) {
-        const { data: govtIdUrl } = await supabase.storage
-          .from("kyc_documents")
-          .createSignedUrl(data.govt_id_url, 86400); // 24 hour expiry
-        if (govtIdUrl) {
-          data.govt_id_url = govtIdUrl.signedUrl;
+        // Extract just the file path from the full URL
+        const filePath = data.govt_id_url.split("/kyc_documents/")[1];
+        if (filePath) {
+          const { data: govtIdUrl } = await supabase.storage
+            .from("kyc_documents")
+            .createSignedUrl(filePath, 86400); // 24 hour expiry
+          if (govtIdUrl) {
+            data.govt_id_url = govtIdUrl.signedUrl;
+          }
         }
       }
 
       if (data.utility_bill_url) {
-        const { data: utilityBillUrl } = await supabase.storage
-          .from("kyc_documents")
-          .createSignedUrl(data.utility_bill_url, 86400); // 24 hour expiry
-        if (utilityBillUrl) {
-          data.utility_bill_url = utilityBillUrl.signedUrl;
+        // Extract just the file path from the full URL
+        const filePath = data.utility_bill_url.split("/kyc_documents/")[1];
+        if (filePath) {
+          const { data: utilityBillUrl } = await supabase.storage
+            .from("kyc_documents")
+            .createSignedUrl(filePath, 86400); // 24 hour expiry
+          if (utilityBillUrl) {
+            data.utility_bill_url = utilityBillUrl.signedUrl;
+          }
         }
       }
 
