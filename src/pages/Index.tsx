@@ -1,4 +1,3 @@
-
 import { ArrowRight, Check, ChevronDown } from "lucide-react";
 import { useState } from "react";
 import Navigation from "@/components/Navigation";
@@ -46,7 +45,7 @@ const Index = () => {
           <div className="relative mt-16">
             <div className="flex justify-center">
               <img
-                src="https://antimetal.com/images/hero/preview.png"
+                src="/lovable-uploads/9396fb71-7f39-4df2-a8ab-3e0409f52601.png"
                 alt="Hero"
                 className="rounded-3xl shadow-2xl max-w-[90%] w-auto h-auto"
               />
