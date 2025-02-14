@@ -56,11 +56,13 @@ const AdminKYCPage = () => {
 
       // Get signed URLs for the documents with 24 hour expiry
       if (data.govt_id_url) {
-        console.log("Getting signed URL for govt ID:", data.govt_id_url);
+        // Extract just the path part from the URL
+        const govtIdPath = data.govt_id_url.split('/kyc_documents/')[1];
+        console.log("Getting signed URL for govt ID path:", govtIdPath);
         
         const { data: govtIdUrl, error: govtIdError } = await supabase.storage
           .from("kyc_documents")
-          .createSignedUrl(data.govt_id_url, 86400);
+          .createSignedUrl(govtIdPath, 86400);
         
         if (govtIdError) {
           console.error("Error getting govt ID signed URL:", govtIdError);
@@ -70,11 +72,13 @@ const AdminKYCPage = () => {
       }
 
       if (data.utility_bill_url) {
-        console.log("Getting signed URL for utility bill:", data.utility_bill_url);
+        // Extract just the path part from the URL
+        const utilityBillPath = data.utility_bill_url.split('/kyc_documents/')[1];
+        console.log("Getting signed URL for utility bill path:", utilityBillPath);
         
         const { data: utilityBillUrl, error: utilityBillError } = await supabase.storage
           .from("kyc_documents")
-          .createSignedUrl(data.utility_bill_url, 86400);
+          .createSignedUrl(utilityBillPath, 86400);
         
         if (utilityBillError) {
           console.error("Error getting utility bill signed URL:", utilityBillError);
@@ -243,17 +247,17 @@ const AdminKYCPage = () => {
           <KYCUserInfo profile={userProfile} />
           
           <KYCAddress
-            addressLine1={kycRequest.address_line1}
-            addressLine2={kycRequest.address_line2}
-            city={kycRequest.city}
-            state={kycRequest.state}
-            postalCode={kycRequest.postal_code}
-            country={kycRequest.country}
+            addressLine1={kycRequest?.address_line1}
+            addressLine2={kycRequest?.address_line2}
+            city={kycRequest?.city}
+            state={kycRequest?.state}
+            postalCode={kycRequest?.postal_code}
+            country={kycRequest?.country}
           />
 
           <KYCDocuments
-            govtIdUrl={kycRequest.govt_id_url}
-            utilityBillUrl={kycRequest.utility_bill_url}
+            govtIdUrl={kycRequest?.govt_id_url}
+            utilityBillUrl={kycRequest?.utility_bill_url}
           />
 
           <KYCActions
