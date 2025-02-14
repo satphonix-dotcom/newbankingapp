@@ -1,24 +1,16 @@
+
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate, useParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Loader2, Check, X } from "lucide-react";
+import { ArrowLeft, Loader2 } from "lucide-react";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
-import { Input } from "@/components/ui/input";
-import { useState } from "react";
+import KYCUserInfo from "@/components/admin/KYCUserInfo";
+import KYCAddress from "@/components/admin/KYCAddress";
+import KYCDocuments from "@/components/admin/KYCDocuments";
+import KYCActions from "@/components/admin/KYCActions";
 
 interface KYCRequest {
   id: string;
@@ -41,8 +33,6 @@ const AdminKYCPage = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const [rejectionReason, setRejectionReason] = useState("");
-  const [showRejectDialog, setShowRejectDialog] = useState(false);
 
   const { data: kycRequest, isLoading } = useQuery({
     queryKey: ["admin-kyc", id],
@@ -164,8 +154,8 @@ const AdminKYCPage = () => {
     navigate("/admin-dashboard");
   };
 
-  const handleReject = async () => {
-    if (!kycRequest || !rejectionReason) return;
+  const handleReject = async (rejectionReason: string) => {
+    if (!kycRequest) return;
 
     const { error } = await supabase
       .from("kyc_requests")
@@ -189,7 +179,6 @@ const AdminKYCPage = () => {
       description: "KYC request rejected successfully",
     });
 
-    setShowRejectDialog(false);
     queryClient.invalidateQueries({ queryKey: ["admin-kyc"] });
     navigate("/admin-dashboard");
   };
@@ -251,125 +240,27 @@ const AdminKYCPage = () => {
             </p>
           </div>
 
-          <Card>
-            <CardHeader>
-              <CardTitle>User Information</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid gap-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="text-sm font-medium">Name</label>
-                    <p>{userProfile?.first_name} {userProfile?.last_name}</p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium">Email</label>
-                    <p>{userProfile?.email}</p>
-                  </div>
-                </div>
-                <div>
-                  <label className="text-sm font-medium">Phone</label>
-                  <p>{userProfile?.phone_number || "Not provided"}</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+          <KYCUserInfo profile={userProfile} />
+          
+          <KYCAddress
+            addressLine1={kycRequest.address_line1}
+            addressLine2={kycRequest.address_line2}
+            city={kycRequest.city}
+            state={kycRequest.state}
+            postalCode={kycRequest.postal_code}
+            country={kycRequest.country}
+          />
 
-          <Card>
-            <CardHeader>
-              <CardTitle>Address Information</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-2">
-                <p>{kycRequest.address_line1}</p>
-                {kycRequest.address_line2 && <p>{kycRequest.address_line2}</p>}
-                <p>
-                  {kycRequest.city}, {kycRequest.state} {kycRequest.postal_code}
-                </p>
-                <p>{kycRequest.country}</p>
-              </div>
-            </CardContent>
-          </Card>
+          <KYCDocuments
+            govtIdUrl={kycRequest.govt_id_url}
+            utilityBillUrl={kycRequest.utility_bill_url}
+          />
 
-          <Card>
-            <CardHeader>
-              <CardTitle>Documents</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid gap-6">
-                {kycRequest.govt_id_url && (
-                  <div>
-                    <h3 className="font-medium mb-2">Government ID</h3>
-                    <a
-                      href={kycRequest.govt_id_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-blue-500 hover:underline"
-                    >
-                      View Government ID
-                    </a>
-                  </div>
-                )}
-                {kycRequest.utility_bill_url && (
-                  <div>
-                    <h3 className="font-medium mb-2">Utility Bill</h3>
-                    <a
-                      href={kycRequest.utility_bill_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-blue-500 hover:underline"
-                    >
-                      View Utility Bill
-                    </a>
-                  </div>
-                )}
-              </div>
-            </CardContent>
-          </Card>
-
-          <div className="flex justify-end gap-4">
-            <Button
-              variant="outline"
-              onClick={() => setShowRejectDialog(true)}
-              className="bg-destructive/10 hover:bg-destructive/20"
-            >
-              <X className="h-4 w-4 mr-2" />
-              Reject
-            </Button>
-            <Button onClick={handleApprove}>
-              <Check className="h-4 w-4 mr-2" />
-              Approve
-            </Button>
-          </div>
+          <KYCActions
+            onApprove={handleApprove}
+            onReject={handleReject}
+          />
         </div>
-
-        <AlertDialog open={showRejectDialog} onOpenChange={setShowRejectDialog}>
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogTitle>Reject KYC Request</AlertDialogTitle>
-              <AlertDialogDescription>
-                Please provide a reason for rejecting this KYC request.
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <div className="py-4">
-              <Input
-                value={rejectionReason}
-                onChange={(e) => setRejectionReason(e.target.value)}
-                placeholder="Enter rejection reason"
-              />
-            </div>
-            <AlertDialogFooter>
-              <AlertDialogCancel>Cancel</AlertDialogCancel>
-              <AlertDialogAction
-                onClick={handleReject}
-                className="bg-destructive hover:bg-destructive/90"
-                disabled={!rejectionReason}
-              >
-                Reject Request
-              </AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
       </main>
       <Footer />
     </div>
