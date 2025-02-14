@@ -3,13 +3,29 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useSiteSettings } from "@/hooks/useSiteSettings";
+import { Button } from "@/components/ui/button";
+import { Loader2, Upload } from "lucide-react";
+import { useState } from "react";
 
 export const SiteSettings = () => {
-  const { settings, isLoading, updateSetting } = useSiteSettings();
+  const { settings, isLoading, updateSetting, uploadLogo } = useSiteSettings();
+  const [uploading, setUploading] = useState(false);
 
   if (isLoading) {
     return <div>Loading settings...</div>;
   }
+
+  const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploading(true);
+    try {
+      await uploadLogo(file);
+    } finally {
+      setUploading(false);
+    }
+  };
 
   return (
     <Card>
@@ -20,6 +36,26 @@ export const SiteSettings = () => {
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
+        <div className="space-y-4">
+          <Label>Logo</Label>
+          <div className="flex items-center gap-4">
+            <img 
+              src={settings?.logoUrl} 
+              alt="Site logo" 
+              className="h-12 w-auto object-contain bg-accent/10 rounded-lg p-2"
+            />
+            <div className="flex-1">
+              <Input
+                type="file"
+                accept="image/*"
+                onChange={handleLogoUpload}
+                disabled={uploading}
+              />
+            </div>
+            {uploading && <Loader2 className="h-4 w-4 animate-spin" />}
+          </div>
+        </div>
+
         <div className="space-y-2">
           <Label htmlFor="bankName">Bank Name</Label>
           <Input

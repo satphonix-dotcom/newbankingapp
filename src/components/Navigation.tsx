@@ -1,4 +1,3 @@
-
 import { Button } from "./ui/button";
 import { Link, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
@@ -96,8 +95,18 @@ const Navigation = () => {
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-lg border-b border-border">
       <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
-        <Link to="/" className="text-xl font-semibold">
-          {settings?.bankName || "BankApp"}
+        <Link to="/" className="flex items-center gap-2">
+          {settings?.logoUrl ? (
+            <img 
+              src={settings.logoUrl} 
+              alt={settings?.bankName || "BankApp"} 
+              className="h-8 w-auto"
+            />
+          ) : (
+            <span className="text-xl font-semibold">
+              {settings?.bankName || "BankApp"}
+            </span>
+          )}
         </Link>
         
         {/* Mobile menu button */}

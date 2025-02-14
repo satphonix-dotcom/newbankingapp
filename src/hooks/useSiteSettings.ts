@@ -9,6 +9,7 @@ export type SiteSettings = {
   contactPhone: string;
   contactAddress: string;
   footerCopyright: string;
+  logoUrl: string;
 };
 
 export const useSiteSettings = () => {
@@ -61,10 +62,43 @@ export const useSiteSettings = () => {
     },
   });
 
+  const uploadLogo = async (file: File) => {
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `logo-${Date.now()}.${fileExt}`;
+
+      // Upload to storage
+      const { error: uploadError, data } = await supabase.storage
+        .from('logos')
+        .upload(fileName, file);
+
+      if (uploadError) throw uploadError;
+
+      // Get public URL
+      const { data: { publicUrl } } = supabase.storage
+        .from('logos')
+        .getPublicUrl(fileName);
+
+      // Update site settings
+      await updateSetting.mutateAsync({ key: 'logoUrl', value: publicUrl });
+
+      return publicUrl;
+    } catch (error) {
+      console.error('Error uploading logo:', error);
+      toast({
+        variant: "destructive",
+        title: "Error uploading logo",
+        description: "Please try again",
+      });
+      throw error;
+    }
+  };
+
   return {
     settings,
     isLoading,
     updateSetting: (key: keyof SiteSettings, value: string) =>
       updateSetting.mutate({ key, value }),
+    uploadLogo,
   };
 };
