@@ -1,11 +1,15 @@
-import { Button } from "./ui/button";
-import { Link, useNavigate } from "react-router-dom";
+
+import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Session } from "@supabase/supabase-js";
 import { useToast } from "./ui/use-toast";
 import { Menu, X } from "lucide-react";
 import { useSiteSettings } from "@/hooks/useSiteSettings";
+import { Logo } from "./navigation/Logo";
+import { NavLinks } from "./navigation/NavLinks";
+import { AuthButtons } from "./navigation/AuthButtons";
+import { MobileMenu } from "./navigation/MobileMenu";
 
 const Navigation = () => {
   const navigate = useNavigate();
@@ -95,19 +99,7 @@ const Navigation = () => {
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-lg border-b border-border">
       <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
-        <Link to="/" className="flex items-center gap-2">
-          {settings?.logoUrl ? (
-            <img 
-              src={settings.logoUrl} 
-              alt={settings?.bankName || "BankApp"} 
-              className="h-8 w-auto"
-            />
-          ) : (
-            <span className="text-xl font-semibold">
-              {settings?.bankName || "BankApp"}
-            </span>
-          )}
-        </Link>
+        <Logo settings={settings} />
         
         {/* Mobile menu button */}
         <button
@@ -123,136 +115,26 @@ const Navigation = () => {
 
         {/* Desktop Navigation */}
         <div className="hidden md:flex items-center space-x-8">
-          <Link to="/features" className="text-secondary hover:text-primary transition-colors">
-            Features
-          </Link>
-          <Link to="/pricing" className="text-secondary hover:text-primary transition-colors">
-            Pricing
-          </Link>
-          <Link to="/about" className="text-secondary hover:text-primary transition-colors">
-            About
-          </Link>
+          <NavLinks />
         </div>
 
         {/* Desktop Auth Buttons */}
         <div className="hidden md:flex items-center space-x-4">
-          {session ? (
-            <>
-              <Link to="/dashboard">
-                <Button variant="ghost">
-                  Dashboard
-                </Button>
-              </Link>
-              {isAdmin && (
-                <Link to="/admin-dashboard">
-                  <Button variant="ghost">
-                    Admin Dashboard
-                  </Button>
-                </Link>
-              )}
-              <Button onClick={handleSignOut}>
-                Sign Out
-              </Button>
-            </>
-          ) : (
-            <>
-              <Link to="/sign-in">
-                <Button variant="ghost">
-                  Sign In
-                </Button>
-              </Link>
-              <Link to="/sign-in">
-                <Button>
-                  Get Started
-                </Button>
-              </Link>
-            </>
-          )}
+          <AuthButtons 
+            session={session} 
+            isAdmin={isAdmin} 
+            onSignOut={handleSignOut}
+          />
         </div>
 
         {/* Mobile Navigation */}
-        {isMobileMenuOpen && (
-          <div className="absolute top-16 left-0 right-0 bg-background border-b border-border md:hidden">
-            <div className="px-6 py-4 space-y-4">
-              <Link 
-                to="/features" 
-                className="block text-secondary hover:text-primary transition-colors"
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                Features
-              </Link>
-              <Link 
-                to="/pricing" 
-                className="block text-secondary hover:text-primary transition-colors"
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                Pricing
-              </Link>
-              <Link 
-                to="/about" 
-                className="block text-secondary hover:text-primary transition-colors"
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                About
-              </Link>
-              
-              {session ? (
-                <>
-                  <Link 
-                    to="/dashboard" 
-                    className="block"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                  >
-                    <Button variant="ghost" className="w-full justify-start">
-                      Dashboard
-                    </Button>
-                  </Link>
-                  {isAdmin && (
-                    <Link 
-                      to="/admin-dashboard" 
-                      className="block"
-                      onClick={() => setIsMobileMenuOpen(false)}
-                    >
-                      <Button variant="ghost" className="w-full justify-start">
-                        Admin Dashboard
-                      </Button>
-                    </Link>
-                  )}
-                  <Button 
-                    onClick={() => {
-                      handleSignOut();
-                      setIsMobileMenuOpen(false);
-                    }}
-                    className="w-full"
-                  >
-                    Sign Out
-                  </Button>
-                </>
-              ) : (
-                <>
-                  <Link 
-                    to="/sign-in" 
-                    className="block"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                  >
-                    <Button variant="ghost" className="w-full justify-start">
-                      Sign In
-                    </Button>
-                  </Link>
-                  <Link 
-                    to="/sign-in" 
-                    className="block"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                  >
-                    <Button className="w-full">
-                      Get Started
-                    </Button>
-                  </Link>
-                </>
-              )}
-            </div>
-          </div>
-        )}
+        <MobileMenu 
+          isOpen={isMobileMenuOpen}
+          session={session}
+          isAdmin={isAdmin}
+          onSignOut={handleSignOut}
+          onClose={() => setIsMobileMenuOpen(false)}
+        />
       </div>
     </nav>
   );
