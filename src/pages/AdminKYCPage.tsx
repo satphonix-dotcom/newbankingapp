@@ -1,4 +1,3 @@
-
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate, useParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -63,11 +62,11 @@ const AdminKYCPage = () => {
         return null;
       }
 
-      // Get signed URLs for the documents
+      // Get signed URLs for the documents with 24 hour expiry
       if (data.govt_id_url) {
         const { data: govtIdUrl } = await supabase.storage
           .from("kyc_documents")
-          .createSignedUrl(data.govt_id_url, 3600); // 1 hour expiry
+          .createSignedUrl(data.govt_id_url, 86400); // 24 hour expiry
         if (govtIdUrl) {
           data.govt_id_url = govtIdUrl.signedUrl;
         }
@@ -76,7 +75,7 @@ const AdminKYCPage = () => {
       if (data.utility_bill_url) {
         const { data: utilityBillUrl } = await supabase.storage
           .from("kyc_documents")
-          .createSignedUrl(data.utility_bill_url, 3600); // 1 hour expiry
+          .createSignedUrl(data.utility_bill_url, 86400); // 24 hour expiry
         if (utilityBillUrl) {
           data.utility_bill_url = utilityBillUrl.signedUrl;
         }
@@ -366,4 +365,3 @@ const AdminKYCPage = () => {
 };
 
 export default AdminKYCPage;
-
