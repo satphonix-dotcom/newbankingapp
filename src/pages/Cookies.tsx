@@ -1,26 +1,7 @@
-
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 
 const Cookies = () => {
-  const cookieTypes = [
-    {
-      type: "Essential Cookies",
-      description: "These cookies are necessary for the website to function and cannot be switched off in our systems.",
-      examples: ["Session Management", "Load Balancing", "Security"]
-    },
-    {
-      type: "Performance Cookies",
-      description: "These cookies allow us to count visits and traffic sources so we can measure and improve the performance of our site.",
-      examples: ["Analytics", "Error Monitoring", "Speed Optimization"]
-    },
-    {
-      type: "Functional Cookies",
-      description: "These cookies enable the website to provide enhanced functionality and personalization.",
-      examples: ["Language Preferences", "User Settings", "Live Chat Services"]
-    }
-  ];
-
   return (
     <div className="min-h-screen bg-background">
       <Navigation />
@@ -31,37 +12,43 @@ const Cookies = () => {
               Cookie Policy
             </h1>
             
-            <p className="text-secondary mb-8">
-              We use cookies and similar technologies to provide, protect, and improve our services.
-              This policy explains how and why we use these technologies and the choices you have.
-            </p>
-
             <div className="space-y-8">
-              {cookieTypes.map((cookie, index) => (
-                <div key={index} className="p-6 rounded-2xl bg-surface border border-border">
-                  <h2 className="text-xl font-semibold mb-3">{cookie.type}</h2>
-                  <p className="text-secondary mb-4">{cookie.description}</p>
-                  <div className="flex flex-wrap gap-2">
-                    {cookie.examples.map((example, i) => (
-                      <span
-                        key={i}
-                        className="px-3 py-1 rounded-full bg-primary/10 text-primary text-sm"
-                      >
-                        {example}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              ))}
-            </div>
+              <div>
+                <h2 className="text-2xl font-semibold mb-4">What Are Cookies</h2>
+                <p className="text-secondary">
+                  Cookies are small text files that are placed on your computer or mobile device
+                  when you visit our website. They help us make our site work better for you
+                  and provide us with insights about how our site is being used.
+                </p>
+              </div>
 
-            <div className="mt-8 p-6 rounded-2xl bg-surface border border-border">
-              <h2 className="text-xl font-semibold mb-4">Managing Your Cookie Preferences</h2>
-              <p className="text-secondary mb-4">
-                Most web browsers allow you to manage your cookie preferences. You can set your browser
-                to refuse cookies, or delete certain cookies. Generally you also have the ability to
-                manage similar technologies in the same way that you manage cookies.
-              </p>
+              <div>
+                <h2 className="text-2xl font-semibold mb-4">How We Use Cookies</h2>
+                <p className="text-secondary">
+                  We use cookies to remember your preferences, understand how you use our site,
+                  and improve your experience. This includes remembering your login status,
+                  language preferences, and other settings.
+                </p>
+              </div>
+
+              <div>
+                <h2 className="text-2xl font-semibold mb-4">Types of Cookies We Use</h2>
+                <p className="text-secondary">
+                  We use both session cookies, which expire when you close your browser,
+                  and persistent cookies, which stay on your device until they expire or
+                  you delete them. We also use essential cookies for our site to function
+                  and analytical cookies to improve our service.
+                </p>
+              </div>
+
+              <div>
+                <h2 className="text-2xl font-semibold mb-4">Managing Cookies</h2>
+                <p className="text-secondary">
+                  You can control and manage cookies in your browser settings. Please note
+                  that removing or blocking cookies may impact your user experience and
+                  some features of our site may not work as intended.
+                </p>
+              </div>
             </div>
           </div>
         </section>

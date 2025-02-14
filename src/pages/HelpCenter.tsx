@@ -1,36 +1,26 @@
-
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
-import { Search } from "lucide-react";
+import { Search, MessageCircle, FileText, Phone } from "lucide-react";
 
 const HelpCenter = () => {
   const categories = [
     {
-      title: "Account & Settings",
-      articles: [
-        "How to reset your password",
-        "Managing account settings",
-        "Two-factor authentication setup",
-        "Updating personal information"
-      ]
+      icon: <MessageCircle className="w-6 h-6" />,
+      title: "FAQ",
+      description: "Find answers to commonly asked questions",
+      link: "#faq"
     },
     {
-      title: "Payments & Transfers",
-      articles: [
-        "Making a transfer",
-        "International payments",
-        "Payment limits",
-        "Transaction fees"
-      ]
+      icon: <FileText className="w-6 h-6" />,
+      title: "Guides",
+      description: "Step-by-step guides for using our services",
+      link: "#guides"
     },
     {
-      title: "Security",
-      articles: [
-        "Keeping your account secure",
-        "Reporting suspicious activity",
-        "Device authorization",
-        "Security best practices"
-      ]
+      icon: <Phone className="w-6 h-6" />,
+      title: "Support",
+      description: "Get in touch with our support team",
+      link: "#support"
     }
   ];
 
@@ -40,36 +30,50 @@ const HelpCenter = () => {
       <main className="pt-16">
         <section className="px-6 lg:px-8 py-24">
           <div className="max-w-7xl mx-auto">
-            <div className="text-center mb-12">
+            <div className="text-center mb-16">
               <h1 className="text-4xl font-bold tracking-tight text-primary mb-4">
-                Help Center
+                How can we help you?
               </h1>
-              <p className="text-lg text-secondary mb-8">
-                Find answers to your questions and learn how to get the most out of BankApp.
+              <p className="text-lg text-secondary max-w-2xl mx-auto mb-8">
+                Search our knowledge base or browse categories below to find the help you need.
               </p>
-              <div className="max-w-xl mx-auto relative">
+              <div className="max-w-2xl mx-auto relative">
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-secondary" />
                 <input
                   type="text"
                   placeholder="Search for help..."
-                  className="w-full px-4 py-3 rounded-full border border-border focus:outline-none focus:ring-2 focus:ring-accent"
+                  className="w-full pl-12 pr-4 py-3 rounded-full border border-border bg-surface focus:outline-none focus:ring-2 focus:ring-primary"
                 />
-                <Search className="absolute right-4 top-1/2 -translate-y-1/2 text-secondary" />
               </div>
             </div>
 
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div className="grid md:grid-cols-3 gap-8">
               {categories.map((category, index) => (
-                <div key={index} className="p-6 rounded-2xl bg-surface border border-border">
-                  <h2 className="text-xl font-semibold mb-4">{category.title}</h2>
-                  <ul className="space-y-3">
-                    {category.articles.map((article, articleIndex) => (
-                      <li key={articleIndex} className="text-secondary hover:text-primary cursor-pointer">
-                        {article}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
+                <a
+                  key={index}
+                  href={category.link}
+                  className="p-6 rounded-2xl bg-surface border border-border hover:border-accent transition-colors"
+                >
+                  <div className="w-12 h-12 rounded-full bg-accent/10 flex items-center justify-center mb-4 text-primary">
+                    {category.icon}
+                  </div>
+                  <h3 className="text-xl font-semibold mb-2">{category.title}</h3>
+                  <p className="text-secondary">{category.description}</p>
+                </a>
               ))}
+            </div>
+
+            <div className="mt-16 text-center">
+              <h2 className="text-2xl font-semibold mb-4">Still need help?</h2>
+              <p className="text-secondary mb-6">
+                Our support team is available 24/7 to assist you with any questions.
+              </p>
+              <a
+                href="/contact"
+                className="inline-flex items-center justify-center px-6 py-3 rounded-full bg-primary text-white hover:bg-primary/90 transition-colors"
+              >
+                Contact Support
+              </a>
             </div>
           </div>
         </section>

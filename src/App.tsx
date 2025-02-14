@@ -11,6 +11,20 @@ import AdminKYCPage from "@/pages/AdminKYCPage";
 import AdminUserPage from "@/pages/AdminUserPage";
 import AccountDetail from "@/pages/AccountDetail";
 import TransactionsDetail from "@/pages/TransactionsDetail";
+import Features from "@/pages/Features";
+import Pricing from "@/pages/Pricing";
+import Security from "@/pages/Security";
+import Status from "@/pages/Status";
+import About from "@/pages/About";
+import Blog from "@/pages/Blog";
+import Careers from "@/pages/Careers";
+import Press from "@/pages/Press";
+import Documentation from "@/pages/Documentation";
+import HelpCenter from "@/pages/HelpCenter";
+import Contact from "@/pages/Contact";
+import Privacy from "@/pages/Privacy";
+import Terms from "@/pages/Terms";
+import Cookies from "@/pages/Cookies";
 
 const router = createBrowserRouter([
   {
@@ -56,6 +70,62 @@ const router = createBrowserRouter([
   {
     path: "/transactions/:id",
     element: <TransactionsDetail />,
+  },
+  {
+    path: "/features",
+    element: <Features />,
+  },
+  {
+    path: "/pricing",
+    element: <Pricing />,
+  },
+  {
+    path: "/security",
+    element: <Security />,
+  },
+  {
+    path: "/status",
+    element: <Status />,
+  },
+  {
+    path: "/about",
+    element: <About />,
+  },
+  {
+    path: "/blog",
+    element: <Blog />,
+  },
+  {
+    path: "/careers",
+    element: <Careers />,
+  },
+  {
+    path: "/press",
+    element: <Press />,
+  },
+  {
+    path: "/documentation",
+    element: <Documentation />,
+  },
+  {
+    path: "/help-center",
+    element: <HelpCenter />,
+  },
+  {
+    path: "/contact",
+    element: <Contact />,
+  },
+  {
+    path: "/privacy",
+    element: <Privacy />,
+  },
+  {
+    path: "/terms",
+    element: <Terms />,
+  },
+  {
+    path: "/cookies",
+    element: <Cookies />,
   },
 ]);
 
