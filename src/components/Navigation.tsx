@@ -5,12 +5,14 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Session } from "@supabase/supabase-js";
 import { useToast } from "./ui/use-toast";
+import { Menu, X } from "lucide-react";
 
 const Navigation = () => {
   const navigate = useNavigate();
   const [session, setSession] = useState<Session | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { toast } = useToast();
 
   // Effect to scroll to top when route changes
@@ -96,6 +98,19 @@ const Navigation = () => {
           BankApp
         </Link>
         
+        {/* Mobile menu button */}
+        <button
+          className="md:hidden p-2"
+          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+        >
+          {isMobileMenuOpen ? (
+            <X className="h-6 w-6" />
+          ) : (
+            <Menu className="h-6 w-6" />
+          )}
+        </button>
+
+        {/* Desktop Navigation */}
         <div className="hidden md:flex items-center space-x-8">
           <Link to="/features" className="text-secondary hover:text-primary transition-colors">
             Features
@@ -108,7 +123,8 @@ const Navigation = () => {
           </Link>
         </div>
 
-        <div className="flex items-center space-x-4">
+        {/* Desktop Auth Buttons */}
+        <div className="hidden md:flex items-center space-x-4">
           {session ? (
             <>
               <Link to="/dashboard">
@@ -142,6 +158,90 @@ const Navigation = () => {
             </>
           )}
         </div>
+
+        {/* Mobile Navigation */}
+        {isMobileMenuOpen && (
+          <div className="absolute top-16 left-0 right-0 bg-background border-b border-border md:hidden">
+            <div className="px-6 py-4 space-y-4">
+              <Link 
+                to="/features" 
+                className="block text-secondary hover:text-primary transition-colors"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                Features
+              </Link>
+              <Link 
+                to="/pricing" 
+                className="block text-secondary hover:text-primary transition-colors"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                Pricing
+              </Link>
+              <Link 
+                to="/about" 
+                className="block text-secondary hover:text-primary transition-colors"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                About
+              </Link>
+              
+              {session ? (
+                <>
+                  <Link 
+                    to="/dashboard" 
+                    className="block"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    <Button variant="ghost" className="w-full justify-start">
+                      Dashboard
+                    </Button>
+                  </Link>
+                  {isAdmin && (
+                    <Link 
+                      to="/admin-dashboard" 
+                      className="block"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                    >
+                      <Button variant="ghost" className="w-full justify-start">
+                        Admin Dashboard
+                      </Button>
+                    </Link>
+                  )}
+                  <Button 
+                    onClick={() => {
+                      handleSignOut();
+                      setIsMobileMenuOpen(false);
+                    }}
+                    className="w-full"
+                  >
+                    Sign Out
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <Link 
+                    to="/sign-in" 
+                    className="block"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    <Button variant="ghost" className="w-full justify-start">
+                      Sign In
+                    </Button>
+                  </Link>
+                  <Link 
+                    to="/sign-in" 
+                    className="block"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    <Button className="w-full">
+                      Get Started
+                    </Button>
+                  </Link>
+                </>
+              )}
+            </div>
+          </div>
+        )}
       </div>
     </nav>
   );
