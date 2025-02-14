@@ -50,6 +50,7 @@ const GetStarted = () => {
             first_name: values.firstName,
             last_name: values.lastName,
           },
+          emailRedirectTo: `${window.location.origin}/sign-in`,
         },
       });
 
