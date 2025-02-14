@@ -3,7 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Loader2 } from "lucide-react";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -12,6 +12,7 @@ import LoadingState from "@/components/admin/LoadingState";
 import AccessDenied from "@/components/admin/AccessDenied";
 import UserAccounts from "@/components/admin/UserAccounts";
 import UserRoleManagement from "@/components/admin/UserRoleManagement";
+import { Badge } from "@/components/ui/badge";
 
 type UserRole = "admin" | "user";
 
@@ -53,18 +54,41 @@ const AdminUserPage = () => {
   const { data: user, isLoading: isUserLoading } = useQuery({
     queryKey: ["admin-user", id],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data: profile, error: profileError } = await supabase
         .from("profiles")
         .select("*, user_roles(role)")
         .eq("id", id!)
         .single();
 
-      if (error) {
-        console.error("Error fetching user:", error);
+      if (profileError) {
+        console.error("Error fetching profile:", profileError);
         return null;
       }
 
-      return data as UserProfile;
+      console.log("Fetched user profile:", profile);
+      return profile as UserProfile;
+    },
+    enabled: !!id && !!isAdmin,
+  });
+
+  const { data: kycRequest } = useQuery({
+    queryKey: ["admin-user-kyc", id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("kyc_requests")
+        .select("*")
+        .eq("user_id", id!)
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      if (error) {
+        console.error("Error fetching KYC request:", error);
+        return null;
+      }
+
+      console.log("Fetched KYC request:", data);
+      return data;
     },
     enabled: !!id && !!isAdmin,
   });
@@ -83,6 +107,7 @@ const AdminUserPage = () => {
         return [];
       }
 
+      console.log("Fetched accounts:", data);
       return data;
     },
     enabled: !!id && !!isAdmin,
@@ -122,10 +147,27 @@ const AdminUserPage = () => {
     );
   }
 
+  const getKycBadge = () => {
+    if (!kycRequest) {
+      return <Badge variant="outline">No KYC Request</Badge>;
+    }
+
+    switch (kycRequest.status) {
+      case "approved":
+        return <Badge className="bg-green-500">KYC Approved</Badge>;
+      case "rejected":
+        return <Badge variant="destructive">KYC Rejected</Badge>;
+      case "pending":
+        return <Badge variant="secondary">KYC Pending</Badge>;
+      default:
+        return null;
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <Navigation />
-      <main className="container mx-auto pt-24 px-4">
+      <main className="container mx-auto pt-24 px-4 pb-12">
         <Button
           variant="ghost"
           className="mb-6"
@@ -136,10 +178,28 @@ const AdminUserPage = () => {
         </Button>
 
         <div className="space-y-6">
-          <div>
-            <h1 className="text-3xl font-bold">
-              User Details: {user.first_name} {user.last_name}
-            </h1>
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-3xl font-bold">
+                User Details: {user.first_name} {user.last_name}
+              </h1>
+              <div className="mt-2 flex gap-2 items-center">
+                {getKycBadge()}
+                {kycRequest?.status === "rejected" && (
+                  <span className="text-sm text-red-500">
+                    Reason: {kycRequest.rejection_reason}
+                  </span>
+                )}
+              </div>
+            </div>
+            {kycRequest && (
+              <Button
+                onClick={() => navigate(`/admin/kyc/${kycRequest.id}`)}
+                variant="outline"
+              >
+                View KYC Details
+              </Button>
+            )}
           </div>
 
           <Card>
