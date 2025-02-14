@@ -62,30 +62,32 @@ const AdminKYCPage = () => {
         return null;
       }
 
+      console.log("Raw KYC data:", data); // Add logging to see the raw data
+
       // Get signed URLs for the documents with 24 hour expiry
       if (data.govt_id_url) {
-        // Extract just the file path from the full URL
-        const filePath = data.govt_id_url.split("/kyc_documents/")[1];
-        if (filePath) {
-          const { data: govtIdUrl } = await supabase.storage
-            .from("kyc_documents")
-            .createSignedUrl(filePath, 86400); // 24 hour expiry
-          if (govtIdUrl) {
-            data.govt_id_url = govtIdUrl.signedUrl;
-          }
+        console.log("Getting signed URL for govt ID:", data.govt_id_url); // Add logging
+        const { data: govtIdUrl, error: govtIdError } = await supabase.storage
+          .from("kyc_documents")
+          .createSignedUrl(data.govt_id_url, 86400); // 24 hour expiry
+        
+        if (govtIdError) {
+          console.error("Error getting govt ID signed URL:", govtIdError); // Add logging
+        } else if (govtIdUrl) {
+          data.govt_id_url = govtIdUrl.signedUrl;
         }
       }
 
       if (data.utility_bill_url) {
-        // Extract just the file path from the full URL
-        const filePath = data.utility_bill_url.split("/kyc_documents/")[1];
-        if (filePath) {
-          const { data: utilityBillUrl } = await supabase.storage
-            .from("kyc_documents")
-            .createSignedUrl(filePath, 86400); // 24 hour expiry
-          if (utilityBillUrl) {
-            data.utility_bill_url = utilityBillUrl.signedUrl;
-          }
+        console.log("Getting signed URL for utility bill:", data.utility_bill_url); // Add logging
+        const { data: utilityBillUrl, error: utilityBillError } = await supabase.storage
+          .from("kyc_documents")
+          .createSignedUrl(data.utility_bill_url, 86400); // 24 hour expiry
+        
+        if (utilityBillError) {
+          console.error("Error getting utility bill signed URL:", utilityBillError); // Add logging
+        } else if (utilityBillUrl) {
+          data.utility_bill_url = utilityBillUrl.signedUrl;
         }
       }
 
