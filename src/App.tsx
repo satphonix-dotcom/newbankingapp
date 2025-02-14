@@ -1,5 +1,5 @@
 
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { createBrowserRouter, RouterProvider, isRouteErrorResponse, useRouteError } from "react-router-dom";
 import Index from "@/pages/Index";
 import SignIn from "@/pages/SignIn";
 import Dashboard from "@/pages/Dashboard";
@@ -26,10 +26,37 @@ import Privacy from "@/pages/Privacy";
 import Terms from "@/pages/Terms";
 import Cookies from "@/pages/Cookies";
 
+function ErrorBoundary() {
+  const error = useRouteError();
+
+  if (isRouteErrorResponse(error)) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="text-center">
+          <h1 className="text-4xl font-bold text-primary mb-4">
+            {error.status} {error.statusText}
+          </h1>
+          <p className="text-secondary mb-4">{error.data}</p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-background">
+      <div className="text-center">
+        <h1 className="text-4xl font-bold text-primary mb-4">Oops!</h1>
+        <p className="text-secondary mb-4">Something went wrong</p>
+      </div>
+    </div>
+  );
+}
+
 const router = createBrowserRouter([
   {
     path: "/",
     element: <Index />,
+    errorElement: <ErrorBoundary />,
   },
   {
     path: "/sign-in",
