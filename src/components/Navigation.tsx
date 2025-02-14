@@ -18,7 +18,7 @@ const Navigation = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { toast } = useToast();
-  const { settings } = useSiteSettings();
+  const { settings, isLoading: isLoadingSettings } = useSiteSettings();
 
   // Effect to scroll to top when route changes
   useEffect(() => {
@@ -92,7 +92,7 @@ const Navigation = () => {
     }
   };
 
-  if (isLoading) {
+  if (isLoading || isLoadingSettings) {
     return null; // Or a loading spinner
   }
 
