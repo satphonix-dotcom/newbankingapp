@@ -69,15 +69,15 @@ const Footer = () => {
             © 2024 BankApp. All rights reserved.
           </p>
           <div className="flex items-center space-x-6">
-            <Link to="#" className="text-white/70 hover:text-white transition-colors">
+            <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="text-white/70 hover:text-white transition-colors">
               Twitter
-            </Link>
-            <Link to="#" className="text-white/70 hover:text-white transition-colors">
+            </a>
+            <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" className="text-white/70 hover:text-white transition-colors">
               LinkedIn
-            </Link>
-            <Link to="#" className="text-white/70 hover:text-white transition-colors">
+            </a>
+            <a href="https://github.com" target="_blank" rel="noopener noreferrer" className="text-white/70 hover:text-white transition-colors">
               GitHub
-            </Link>
+            </a>
           </div>
         </div>
       </div>

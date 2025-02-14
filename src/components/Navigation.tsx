@@ -134,7 +134,7 @@ const Navigation = () => {
                   Sign In
                 </Button>
               </Link>
-              <Link to="/get-started">
+              <Link to="/sign-in">
                 <Button>
                   Get Started
                 </Button>
