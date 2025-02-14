@@ -66,40 +66,30 @@ const AdminKYCPage = () => {
 
       // Get signed URLs for the documents with 24 hour expiry
       if (data.govt_id_url) {
-        // Extract just the path after 'kyc_documents/'
-        const match = data.govt_id_url.match(/kyc_documents\/(.+)$/);
-        if (match && match[1]) {
-          const filePath = match[1];
-          console.log("Getting signed URL for govt ID, path:", filePath);
-          
-          const { data: govtIdUrl, error: govtIdError } = await supabase.storage
-            .from("kyc_documents")
-            .createSignedUrl(filePath, 86400);
-          
-          if (govtIdError) {
-            console.error("Error getting govt ID signed URL:", govtIdError);
-          } else if (govtIdUrl) {
-            data.govt_id_url = govtIdUrl.signedUrl;
-          }
+        console.log("Getting signed URL for govt ID:", data.govt_id_url);
+        
+        const { data: govtIdUrl, error: govtIdError } = await supabase.storage
+          .from("kyc_documents")
+          .createSignedUrl(data.govt_id_url, 86400);
+        
+        if (govtIdError) {
+          console.error("Error getting govt ID signed URL:", govtIdError);
+        } else if (govtIdUrl) {
+          data.govt_id_url = govtIdUrl.signedUrl;
         }
       }
 
       if (data.utility_bill_url) {
-        // Extract just the path after 'kyc_documents/'
-        const match = data.utility_bill_url.match(/kyc_documents\/(.+)$/);
-        if (match && match[1]) {
-          const filePath = match[1];
-          console.log("Getting signed URL for utility bill, path:", filePath);
-          
-          const { data: utilityBillUrl, error: utilityBillError } = await supabase.storage
-            .from("kyc_documents")
-            .createSignedUrl(filePath, 86400);
-          
-          if (utilityBillError) {
-            console.error("Error getting utility bill signed URL:", utilityBillError);
-          } else if (utilityBillUrl) {
-            data.utility_bill_url = utilityBillUrl.signedUrl;
-          }
+        console.log("Getting signed URL for utility bill:", data.utility_bill_url);
+        
+        const { data: utilityBillUrl, error: utilityBillError } = await supabase.storage
+          .from("kyc_documents")
+          .createSignedUrl(data.utility_bill_url, 86400);
+        
+        if (utilityBillError) {
+          console.error("Error getting utility bill signed URL:", utilityBillError);
+        } else if (utilityBillUrl) {
+          data.utility_bill_url = utilityBillUrl.signedUrl;
         }
       }
 
