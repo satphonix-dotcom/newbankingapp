@@ -1,3 +1,4 @@
+
 import { ArrowRight, Check, ChevronDown } from "lucide-react";
 import { useState } from "react";
 import Navigation from "@/components/Navigation";
@@ -25,16 +26,20 @@ const Index = () => {
               Experience banking reimagined. Simple, secure, and designed for the modern world.
             </p>
             <div className="flex justify-center gap-4">
-              <Link to="/get-started">
+              <Link to="/sign-in">
                 <button className="px-6 py-3 bg-primary text-white rounded-full hover:bg-primary/90 transition-colors">
                   Get Started
                 </button>
               </Link>
-              <Link to="/features">
-                <button className="px-6 py-3 glass rounded-full hover:bg-white/20 transition-colors flex items-center gap-2">
-                  Learn More <ArrowRight className="w-4 h-4" />
-                </button>
-              </Link>
+              <button 
+                onClick={() => {
+                  const featuresSection = document.querySelector('#features');
+                  featuresSection?.scrollIntoView({ behavior: 'smooth' });
+                }}
+                className="px-6 py-3 glass rounded-full hover:bg-white/20 transition-colors flex items-center gap-2"
+              >
+                Learn More <ArrowRight className="w-4 h-4" />
+              </button>
             </div>
           </div>
 
@@ -49,7 +54,7 @@ const Index = () => {
           </div>
         </section>
 
-        <section className="py-24 bg-surface px-6 lg:px-8">
+        <section id="features" className="py-24 bg-surface px-6 lg:px-8">
           <div className="mx-auto max-w-7xl">
             <h2 className="text-3xl font-bold text-center mb-16">Features designed for you</h2>
             <div className="grid md:grid-cols-3 gap-8">
@@ -133,9 +138,11 @@ const Index = () => {
             <p className="text-white/80 mb-8 max-w-2xl mx-auto">
               Join thousands of satisfied customers who have already made the switch.
             </p>
-            <button className="px-8 py-4 bg-accent text-primary rounded-full font-semibold hover:bg-accent/90 transition-colors">
-              Create Account
-            </button>
+            <Link to="/sign-in">
+              <button className="px-8 py-4 bg-accent text-primary rounded-full font-semibold hover:bg-accent/90 transition-colors">
+                Create Account
+              </button>
+            </Link>
           </div>
         </section>
       </main>
