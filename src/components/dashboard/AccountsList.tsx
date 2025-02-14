@@ -66,12 +66,12 @@ const AccountsList = ({ userId }: AccountsListProps) => {
   };
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
       {accounts?.map((account) => (
         <Card 
           key={account.id}
           className={cn(
-            "transition-all",
+            "transition-all w-full",
             account.is_restricted 
               ? "opacity-75 cursor-not-allowed bg-gray-50" 
               : "cursor-pointer hover:shadow-lg"
@@ -80,12 +80,12 @@ const AccountsList = ({ userId }: AccountsListProps) => {
         >
           <CardHeader>
             <CardTitle className="flex justify-between items-start">
-              <div>
-                <span className="block text-lg">{account.name}</span>
-                <span className="text-sm text-muted-foreground">
+              <div className="max-w-[70%]">
+                <span className="block text-lg truncate">{account.name}</span>
+                <span className="text-sm text-muted-foreground block truncate">
                   Account No: {account.account_number}
                 </span>
-                <span className="text-sm text-muted-foreground capitalize block">
+                <span className="text-sm text-muted-foreground capitalize block truncate">
                   {account.account_type}
                 </span>
               </div>
@@ -100,7 +100,7 @@ const AccountsList = ({ userId }: AccountsListProps) => {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-2xl font-bold mb-4">
+            <p className="text-xl sm:text-2xl font-bold mb-4 break-words">
               {new Intl.NumberFormat("en-US", {
                 style: "currency",
                 currency: account.currency,

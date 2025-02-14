@@ -58,9 +58,9 @@ const Welcome = ({ userId }: WelcomeProps) => {
   });
 
   return (
-    <div className="flex items-center justify-between">
+    <div className="w-full sm:w-auto">
       <div>
-        <h1 className="text-3xl font-bold">Dashboard</h1>
+        <h1 className="text-2xl sm:text-3xl font-bold">Dashboard</h1>
         {userProfile && (
           <p className="text-muted-foreground mt-1">
             Welcome, {userProfile.first_name} {userProfile.last_name}
@@ -68,7 +68,7 @@ const Welcome = ({ userId }: WelcomeProps) => {
         )}
       </div>
 
-      <div className="flex gap-2">
+      <div className="flex flex-wrap gap-2 mt-4 sm:mt-0">
         <Button
           variant="outline"
           size="sm"

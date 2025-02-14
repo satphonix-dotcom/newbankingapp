@@ -71,13 +71,13 @@ const Dashboard = () => {
   return (
     <div className="min-h-screen bg-background">
       <Navigation />
-      <main className="pt-24 px-6 lg:px-8 max-w-7xl mx-auto">
-        <div className="flex justify-between items-center mb-8">
+      <main className="pt-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto pb-12">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
           <Welcome userId={userId} />
           <CreateAccountDialog userId={userId} />
         </div>
 
-        <div className="grid gap-6">
+        <div className="space-y-6">
           <AccountsList userId={userId} />
           <TransactionsList userId={userId} accounts={accounts || []} />
         </div>
