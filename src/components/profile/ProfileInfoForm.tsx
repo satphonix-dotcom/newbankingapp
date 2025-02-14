@@ -1,7 +1,8 @@
+
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import { Form, FormControl, FormField, FormItem, FormLabel } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -130,6 +131,7 @@ const ProfileInfoForm = ({ userId, initialData, onSuccess }: ProfileInfoFormProp
       });
       onSuccess();
     } catch (error) {
+      console.error("Profile update error:", error);
       toast({
         variant: "destructive",
         title: "Error",
