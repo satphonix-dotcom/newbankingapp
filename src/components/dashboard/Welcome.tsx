@@ -37,13 +37,13 @@ const Welcome = ({ userId }: WelcomeProps) => {
         <Button variant="outline" asChild>
           <Link to="/profile">
             <UserCircle className="w-4 h-4 mr-2" />
-            Profile
+            My Profile
           </Link>
         </Button>
         <Button variant="outline" asChild>
           <Link to="/kyc">
             <FileCheck className="w-4 h-4 mr-2" />
-            KYC Verification
+            Identity Verification
           </Link>
         </Button>
       </div>
