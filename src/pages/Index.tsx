@@ -41,16 +41,6 @@ const Index = () => {
               </button>
             </div>
           </div>
-
-          <div className="relative mt-16">
-            <div className="flex justify-center">
-              <img
-                src="/lovable-uploads/9396fb71-7f39-4df2-a8ab-3e0409f52601.png"
-                alt="Hero"
-                className="rounded-3xl shadow-2xl max-w-[90%] w-auto h-auto"
-              />
-            </div>
-          </div>
         </section>
 
         <section id="features" className="py-24 bg-surface px-6 lg:px-8">
