@@ -10,11 +10,16 @@ export const Logo = ({ settings }: LogoProps) => {
   return (
     <Link to="/" className="flex items-center gap-2">
       {settings?.logoUrl ? (
-        <img 
-          src={settings.logoUrl} 
-          alt={settings?.bankName || "BankApp"} 
-          className="h-8 w-auto"
-        />
+        <div className="flex items-center gap-2">
+          <img 
+            src={settings.logoUrl} 
+            alt={settings?.bankName || "BankApp"} 
+            className="h-8 w-auto"
+          />
+          <span className="text-xl font-semibold">
+            {settings?.bankName || "BankApp"}
+          </span>
+        </div>
       ) : (
         <span className="text-xl font-semibold">
           {settings?.bankName || "BankApp"}
