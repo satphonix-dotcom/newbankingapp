@@ -19,6 +19,18 @@ const TransferForm = ({ form, onSubmit, accounts, accountsLoading, fromAccount }
   return (
     <Form {...form}>
       <form onSubmit={onSubmit} className="space-y-4">
+        <div className="bg-muted/50 p-4 rounded-lg mb-4">
+          <p className="text-sm text-muted-foreground mb-1">Available Balance</p>
+          <p className="text-xl font-semibold">
+            {new Intl.NumberFormat("en-US", {
+              style: "currency",
+              currency: fromAccount.currency,
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
+            }).format(fromAccount.balance)}
+          </p>
+        </div>
+
         <FormField
           control={form.control}
           name="toAccountId"
@@ -63,6 +75,7 @@ const TransferForm = ({ form, onSubmit, accounts, accountsLoading, fromAccount }
                   type="number"
                   step="0.01"
                   min="0"
+                  max={fromAccount.balance}
                   placeholder="Enter amount"
                   {...field}
                 />
