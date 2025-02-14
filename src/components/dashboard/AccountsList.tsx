@@ -53,7 +53,7 @@ const AccountsList = ({ userId }: AccountsListProps) => {
 
   const handleAccountClick = (account: any) => {
     if (!account.is_restricted) {
-      navigate(`/account/${account.id}`);
+      navigate(`/accounts/${account.id}`);
     }
   };
 

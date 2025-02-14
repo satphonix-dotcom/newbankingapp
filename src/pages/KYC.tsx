@@ -51,6 +51,10 @@ const KYC = () => {
     }
   };
 
+  const shouldShowForm = () => {
+    return !kycRequest || kycRequest.status === "rejected";
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <Navigation />
@@ -78,7 +82,7 @@ const KYC = () => {
                 <Loader2 className="h-6 w-6 animate-spin" />
               </CardContent>
             </Card>
-          ) : kycRequest ? (
+          ) : kycRequest && kycRequest.status !== "rejected" ? (
             <Card>
               <CardHeader>
                 <CardTitle className="flex justify-between">
@@ -89,12 +93,6 @@ const KYC = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                {kycRequest.status === "rejected" && (
-                  <div className="bg-red-50 text-red-700 p-4 rounded-md mb-4">
-                    <p className="font-semibold">Rejection Reason:</p>
-                    <p>{kycRequest.rejection_reason}</p>
-                  </div>
-                )}
                 {kycRequest.status === "submitted" && (
                   <div className="bg-blue-50 text-blue-700 p-4 rounded-md">
                     Your documents are under review. We'll notify you once the verification is complete.
@@ -109,6 +107,12 @@ const KYC = () => {
             </Card>
           ) : (
             <div className="grid gap-4">
+              {kycRequest?.status === "rejected" && (
+                <div className="bg-red-50 text-red-700 p-4 rounded-md mb-4">
+                  <p className="font-semibold">Previous submission was rejected:</p>
+                  <p>{kycRequest.rejection_reason}</p>
+                </div>
+              )}
               <Card>
                 <CardHeader>
                   <CardTitle className="text-xl">Required Documents</CardTitle>
@@ -140,7 +144,7 @@ const KYC = () => {
                 className="w-full"
               >
                 <Upload className="h-4 w-4 mr-2" />
-                Start Verification
+                {kycRequest?.status === "rejected" ? "Re-submit Documents" : "Start Verification"}
               </Button>
             </div>
           )}
