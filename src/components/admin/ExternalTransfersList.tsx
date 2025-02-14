@@ -100,7 +100,8 @@ const ExternalTransfersList = () => {
                 <TableHead>From Account</TableHead>
                 <TableHead>Amount</TableHead>
                 <TableHead>Recipient</TableHead>
-                <TableHead>Bank</TableHead>
+                <TableHead>Bank Details</TableHead>
+                <TableHead>Description</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead>Actions</TableHead>
               </TableRow>
@@ -131,13 +132,20 @@ const ExternalTransfersList = () => {
                     <span className="text-sm text-muted-foreground">
                       {transfer.recipient_account_number}
                     </span>
+                    <br />
+                    <span className="text-sm text-muted-foreground">
+                      {transfer.recipient_country}
+                    </span>
                   </TableCell>
                   <TableCell>
                     {transfer.recipient_bank}
                     <br />
                     <span className="text-sm text-muted-foreground">
-                      {transfer.recipient_swift_bic}
+                      SWIFT/BIC: {transfer.recipient_swift_bic}
                     </span>
+                  </TableCell>
+                  <TableCell className="max-w-[200px] break-words">
+                    {transfer.description || '-'}
                   </TableCell>
                   <TableCell className="capitalize">{transfer.status}</TableCell>
                   <TableCell>
