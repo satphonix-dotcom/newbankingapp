@@ -1,100 +1,38 @@
 
+import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
-import { UserCog, Receipt, ShieldCheck } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { Send } from "lucide-react";
 
 interface WelcomeProps {
   userId: string;
 }
 
 const Welcome = ({ userId }: WelcomeProps) => {
-  const { toast } = useToast();
-  const navigate = useNavigate();
-
-  const { data: userProfile } = useQuery({
+  const { data: profile } = useQuery({
     queryKey: ["profile", userId],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data } = await supabase
         .from("profiles")
-        .select("first_name, last_name")
+        .select("first_name")
         .eq("id", userId)
         .single();
-
-      if (error) {
-        toast({
-          variant: "destructive",
-          title: "Error",
-          description: "Failed to fetch user profile",
-        });
-        return null;
-      }
-
       return data;
     },
-    enabled: !!userId,
-  });
-
-  const { data: kycStatus } = useQuery({
-    queryKey: ["kyc-status", userId],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("kyc_requests")
-        .select("status")
-        .eq("user_id", userId)
-        .order("created_at", { ascending: false })
-        .limit(1)
-        .maybeSingle();
-
-      if (error) {
-        console.error("Error fetching KYC status:", error);
-      }
-
-      return data?.status || "pending";
-    },
-    enabled: !!userId,
   });
 
   return (
-    <div className="w-full sm:w-auto">
-      <div>
-        <h1 className="text-2xl sm:text-3xl font-bold">Dashboard</h1>
-        {userProfile && (
-          <p className="text-muted-foreground mt-1">
-            Welcome, {userProfile.first_name} {userProfile.last_name}
-          </p>
-        )}
-      </div>
-
-      <div className="flex flex-wrap gap-2 mt-4 sm:mt-0">
-        <Button
-          variant="outline"
-          size="sm"
-          className="flex items-center gap-2"
-          onClick={() => navigate("/kyc")}
-        >
-          <ShieldCheck className="h-4 w-4" />
-          {kycStatus === "approved" ? "Verified" : "Verify Identity"}
-        </Button>
-        <Button
-          variant="outline"
-          size="sm"
-          className="flex items-center gap-2"
-          onClick={() => navigate("/transactions")}
-        >
-          <Receipt className="h-4 w-4" />
-          Transactions
-        </Button>
-        <Button
-          variant="outline"
-          size="sm"
-          className="flex items-center gap-2"
-          onClick={() => navigate("/profile")}
-        >
-          <UserCog className="h-4 w-4" />
-          Edit Profile
+    <div className="space-y-2">
+      <h1 className="text-3xl font-bold">
+        Welcome{profile?.first_name ? `, ${profile.first_name}` : ""}
+      </h1>
+      <div className="flex gap-2">
+        <Button asChild>
+          <Link to="/external-transfer">
+            <Send className="w-4 h-4 mr-2" />
+            External Transfer
+          </Link>
         </Button>
       </div>
     </div>

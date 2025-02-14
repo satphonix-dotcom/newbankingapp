@@ -65,6 +65,88 @@ export type Database = {
           },
         ]
       }
+      external_transfers: {
+        Row: {
+          admin_notes: string | null
+          amount: number
+          created_at: string
+          currency: Database["public"]["Enums"]["currency_type"]
+          description: string | null
+          from_account_id: string
+          id: string
+          processed_at: string | null
+          processed_by: string | null
+          recipient_account_number: string
+          recipient_bank: string
+          recipient_country: string
+          recipient_name: string
+          recipient_swift_bic: string
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          admin_notes?: string | null
+          amount: number
+          created_at?: string
+          currency: Database["public"]["Enums"]["currency_type"]
+          description?: string | null
+          from_account_id: string
+          id?: string
+          processed_at?: string | null
+          processed_by?: string | null
+          recipient_account_number: string
+          recipient_bank: string
+          recipient_country: string
+          recipient_name: string
+          recipient_swift_bic: string
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          admin_notes?: string | null
+          amount?: number
+          created_at?: string
+          currency?: Database["public"]["Enums"]["currency_type"]
+          description?: string | null
+          from_account_id?: string
+          id?: string
+          processed_at?: string | null
+          processed_by?: string | null
+          recipient_account_number?: string
+          recipient_bank?: string
+          recipient_country?: string
+          recipient_name?: string
+          recipient_swift_bic?: string
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "external_transfers_from_account_id_fkey"
+            columns: ["from_account_id"]
+            isOneToOne: false
+            referencedRelation: "accounts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "external_transfers_processed_by_fkey"
+            columns: ["processed_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "external_transfers_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       kyc_requests: {
         Row: {
           address_line1: string | null
