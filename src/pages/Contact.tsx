@@ -1,7 +1,11 @@
+
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
+import { useSiteSettings } from "@/hooks/useSiteSettings";
 
 const Contact = () => {
+  const { settings } = useSiteSettings();
+  
   return (
     <div className="min-h-screen bg-background">
       <Navigation />
@@ -86,13 +90,13 @@ const Contact = () => {
                 <h2 className="text-2xl font-semibold mb-4">Other Ways to Reach Us</h2>
                 <div className="space-y-4">
                   <p className="text-secondary">
-                    <strong>Email:</strong> support@bankapp.com
+                    <strong>Email:</strong> {settings?.contactEmail}
                   </p>
                   <p className="text-secondary">
-                    <strong>Phone:</strong> +1 (555) 123-4567
+                    <strong>Phone:</strong> {settings?.contactPhone}
                   </p>
                   <p className="text-secondary">
-                    <strong>Address:</strong> 123 Financial Street, Banking District, NY 10001
+                    <strong>Address:</strong> {settings?.contactAddress}
                   </p>
                 </div>
               </div>

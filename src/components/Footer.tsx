@@ -1,7 +1,10 @@
 
 import { Link } from "react-router-dom";
+import { useSiteSettings } from "@/hooks/useSiteSettings";
 
 const Footer = () => {
+  const { settings } = useSiteSettings();
+  
   const footerSections = [
     {
       title: "Product",
@@ -66,7 +69,7 @@ const Footer = () => {
         
         <div className="pt-8 border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-white/70 text-sm">
-            © 2024 BankApp. All rights reserved.
+            {settings?.footerCopyright || "© 2024 BankApp. All rights reserved."}
           </p>
           <div className="flex items-center space-x-6">
             <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="text-white/70 hover:text-white transition-colors">

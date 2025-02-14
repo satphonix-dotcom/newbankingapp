@@ -10,6 +10,7 @@ import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import UsersList from "@/components/admin/UsersList";
 import { Badge } from "@/components/ui/badge";
+import { SiteSettings } from "@/components/admin/SiteSettings";
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
@@ -67,6 +68,7 @@ const AdminDashboard = () => {
           <TabsList>
             <TabsTrigger value="users">Users</TabsTrigger>
             <TabsTrigger value="kyc">KYC Requests</TabsTrigger>
+            <TabsTrigger value="settings">Site Settings</TabsTrigger>
           </TabsList>
 
           <TabsContent value="users" className="space-y-4">
@@ -123,6 +125,10 @@ const AdminDashboard = () => {
                 </div>
               </CardContent>
             </Card>
+          </TabsContent>
+
+          <TabsContent value="settings" className="space-y-4">
+            <SiteSettings />
           </TabsContent>
         </Tabs>
       </main>

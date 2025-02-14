@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Session } from "@supabase/supabase-js";
 import { useToast } from "./ui/use-toast";
 import { Menu, X } from "lucide-react";
+import { useSiteSettings } from "@/hooks/useSiteSettings";
 
 const Navigation = () => {
   const navigate = useNavigate();
@@ -14,6 +15,7 @@ const Navigation = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { toast } = useToast();
+  const { settings } = useSiteSettings();
 
   // Effect to scroll to top when route changes
   useEffect(() => {
@@ -95,7 +97,7 @@ const Navigation = () => {
     <nav className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-lg border-b border-border">
       <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
         <Link to="/" className="text-xl font-semibold">
-          BankApp
+          {settings?.bankName || "BankApp"}
         </Link>
         
         {/* Mobile menu button */}
