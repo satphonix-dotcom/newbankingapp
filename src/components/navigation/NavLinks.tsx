@@ -10,18 +10,7 @@ export const NavLinks = ({ isMobile, onMobileMenuClose }: NavLinksProps) => {
   const links = [
     { to: "/features", text: "Features" },
     { to: "/pricing", text: "Pricing" },
-    { to: "/security", text: "Security" },
-    { to: "/status", text: "Status" },
     { to: "/about", text: "About" },
-    { to: "/blog", text: "Blog" },
-    { to: "/careers", text: "Careers" },
-    { to: "/press", text: "Press" },
-    { to: "/documentation", text: "Documentation" },
-    { to: "/help-center", text: "Help Center" },
-    { to: "/contact", text: "Contact" },
-    { to: "/privacy", text: "Privacy" },
-    { to: "/terms", text: "Terms" },
-    { to: "/cookies", text: "Cookies" },
   ];
 
   return (
