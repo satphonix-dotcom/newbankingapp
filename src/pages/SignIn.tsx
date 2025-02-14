@@ -56,19 +56,47 @@ const SignIn = () => {
     },
   });
 
+  const checkUserBlockStatus = async (userId: string) => {
+    const { data: profile, error } = await supabase
+      .from("profiles")
+      .select("is_blocked, blocked_reason")
+      .eq("id", userId)
+      .single();
+
+    if (error) {
+      console.error("Error checking user block status:", error);
+      return false;
+    }
+
+    return profile?.is_blocked ? profile.blocked_reason : false;
+  };
+
   async function onSignIn(values: z.infer<typeof signInSchema>) {
     try {
       setIsLoading(true);
-      const { error } = await supabase.auth.signInWithPassword({
+      const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
         email: values.email,
         password: values.password,
       });
 
-      if (error) {
+      if (signInError) {
         toast({
           variant: "destructive",
           title: "Error signing in",
-          description: error.message,
+          description: signInError.message,
+        });
+        return;
+      }
+
+      // Check if user is blocked
+      const blockedReason = await checkUserBlockStatus(signInData.user.id);
+      if (blockedReason) {
+        // Sign out the user immediately
+        await supabase.auth.signOut();
+        toast({
+          variant: "destructive",
+          title: "Access Denied",
+          description: `Your account has been blocked. Reason: ${blockedReason}`,
         });
         return;
       }
