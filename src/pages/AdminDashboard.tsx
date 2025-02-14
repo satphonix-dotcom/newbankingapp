@@ -5,7 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import UsersList from "@/components/admin/UsersList";
-import SiteSettings from "@/components/admin/SiteSettings";
+import { SiteSettings } from "@/components/admin/SiteSettings";
 import ExternalTransfersList from "@/components/admin/ExternalTransfersList";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 

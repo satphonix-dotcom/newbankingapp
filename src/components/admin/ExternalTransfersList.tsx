@@ -28,7 +28,11 @@ const ExternalTransfersList = () => {
         .from("external_transfers")
         .select(`
           *,
-          profiles:user_id(first_name, last_name, email),
+          user:user_id(
+            first_name:profiles!user_id(first_name),
+            last_name:profiles!user_id(last_name),
+            email:profiles!user_id(email)
+          ),
           from_account:accounts!external_transfers_from_account_id_fkey(name)
         `)
         .order("created_at", { ascending: false });
@@ -112,10 +116,10 @@ const ExternalTransfersList = () => {
                     {new Date(transfer.created_at).toLocaleDateString()}
                   </TableCell>
                   <TableCell>
-                    {transfer.profiles?.first_name} {transfer.profiles?.last_name}
+                    {transfer.user?.first_name?.first_name} {transfer.user?.last_name?.last_name}
                     <br />
                     <span className="text-sm text-muted-foreground">
-                      {transfer.profiles?.email}
+                      {transfer.user?.email?.email}
                     </span>
                   </TableCell>
                   <TableCell>{transfer.from_account?.name}</TableCell>
