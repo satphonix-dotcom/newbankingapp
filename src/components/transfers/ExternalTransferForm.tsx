@@ -62,6 +62,13 @@ const ExternalTransferForm = ({
     try {
       const amount = Number(values.amount);
       
+      // Get current user session
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.user) {
+        navigate("/sign-in");
+        return;
+      }
+
       // Validate amount against balance
       if (amount > selectedAccount?.balance) {
         toast({
@@ -76,6 +83,7 @@ const ExternalTransferForm = ({
       const { error: transferError } = await supabase
         .from("external_transfers")
         .insert({
+          user_id: session.user.id,
           from_account_id: values.fromAccountId,
           amount,
           currency: selectedAccount.currency,

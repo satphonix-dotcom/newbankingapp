@@ -1,3 +1,4 @@
+
 import { createBrowserRouter, RouterProvider, isRouteErrorResponse, useRouteError } from "react-router-dom";
 import Index from "@/pages/Index";
 import SignIn from "@/pages/SignIn";
@@ -67,10 +68,6 @@ const router = createBrowserRouter([
     element: <Dashboard />,
   },
   {
-    path: "/external-transfer",
-    element: <ExternalTransfer />,
-  },
-  {
     path: "/profile",
     element: <Profile />,
   },
@@ -101,6 +98,10 @@ const router = createBrowserRouter([
   {
     path: "/transactions/:id",
     element: <TransactionsDetail />,
+  },
+  {
+    path: "/external-transfer",
+    element: <ExternalTransfer />,
   },
   {
     path: "/features",
