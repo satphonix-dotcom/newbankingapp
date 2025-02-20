@@ -1,4 +1,3 @@
-
 import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -9,6 +8,7 @@ import Footer from "@/components/Footer";
 import ProfileAvatar from "@/components/profile/ProfileAvatar";
 import ProfileInfoForm from "@/components/profile/ProfileInfoForm";
 import PasswordChangeForm from "@/components/profile/PasswordChangeForm";
+import TwoFactorSettings from "@/components/profile/TwoFactorSettings";
 
 const Profile = () => {
   const navigate = useNavigate();
@@ -72,7 +72,7 @@ const Profile = () => {
           <div>
             <h1 className="text-3xl font-bold">Edit Profile</h1>
             <p className="text-muted-foreground mt-2">
-              Update your personal information
+              Update your personal information and security settings
             </p>
           </div>
 
@@ -89,7 +89,13 @@ const Profile = () => {
             onSuccess={refetch}
           />
 
-          <PasswordChangeForm />
+          <div className="border-t pt-8">
+            <TwoFactorSettings />
+          </div>
+
+          <div className="border-t pt-8">
+            <PasswordChangeForm />
+          </div>
         </div>
       </main>
       <Footer />

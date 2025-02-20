@@ -235,6 +235,8 @@ export type Database = {
           is_blocked: boolean | null
           last_name: string | null
           phone_number: string | null
+          phone_verified: boolean | null
+          two_factor_method: string | null
         }
         Insert: {
           avatar_url?: string | null
@@ -246,6 +248,8 @@ export type Database = {
           is_blocked?: boolean | null
           last_name?: string | null
           phone_number?: string | null
+          phone_verified?: boolean | null
+          two_factor_method?: string | null
         }
         Update: {
           avatar_url?: string | null
@@ -257,6 +261,8 @@ export type Database = {
           is_blocked?: boolean | null
           last_name?: string | null
           phone_number?: string | null
+          phone_verified?: boolean | null
+          two_factor_method?: string | null
         }
         Relationships: []
       }
@@ -387,11 +393,48 @@ export type Database = {
           },
         ]
       }
+      verification_codes: {
+        Row: {
+          attempts: number | null
+          code: string
+          created_at: string
+          expires_at: string
+          id: string
+          type: string
+          user_id: string | null
+          verified: boolean | null
+        }
+        Insert: {
+          attempts?: number | null
+          code: string
+          created_at?: string
+          expires_at: string
+          id?: string
+          type: string
+          user_id?: string | null
+          verified?: boolean | null
+        }
+        Update: {
+          attempts?: number | null
+          code?: string
+          created_at?: string
+          expires_at?: string
+          id?: string
+          type?: string
+          user_id?: string | null
+          verified?: boolean | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
+      cleanup_expired_verification_codes: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
       generate_account_number: {
         Args: Record<PropertyKey, never>
         Returns: string
