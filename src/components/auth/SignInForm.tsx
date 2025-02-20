@@ -19,13 +19,15 @@ export const signInSchema = z.object({
   password: z.string().min(8, "Password must be at least 8 characters"),
 });
 
+export type SignInFormValues = z.infer<typeof signInSchema>;
+
 interface SignInFormProps {
-  onSubmit: (values: z.infer<typeof signInSchema>) => Promise<void>;
+  onSubmit: (values: SignInFormValues) => Promise<void>;
   isLoading: boolean;
 }
 
 const SignInForm = ({ onSubmit, isLoading }: SignInFormProps) => {
-  const form = useForm<z.infer<typeof signInSchema>>({
+  const form = useForm<SignInFormValues>({
     resolver: zodResolver(signInSchema),
     defaultValues: {
       email: "",
