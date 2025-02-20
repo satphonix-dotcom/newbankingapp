@@ -14,7 +14,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { ArrowRight, Loader2 } from "lucide-react";
 
-const signUpSchema = z.object({
+export const signUpSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
   password: z.string().min(8, "Password must be at least 8 characters"),
   firstName: z.string().min(2, "First name must be at least 2 characters"),

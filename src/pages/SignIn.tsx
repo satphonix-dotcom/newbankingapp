@@ -6,8 +6,8 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import SignInForm from "@/components/auth/SignInForm";
-import SignUpForm from "@/components/auth/SignUpForm";
+import SignInForm, { signInSchema } from "@/components/auth/SignInForm";
+import SignUpForm, { signUpSchema } from "@/components/auth/SignUpForm";
 import TwoFactorVerification from "@/components/auth/TwoFactorVerification";
 import * as z from "zod";
 
@@ -37,7 +37,7 @@ const SignIn = () => {
     };
   };
 
-  async function onSignIn(values: z.infer<typeof SignInForm.schema>) {
+  async function onSignIn(values: z.infer<typeof signInSchema>) {
     try {
       setIsLoading(true);
       const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
@@ -109,7 +109,7 @@ const SignIn = () => {
     }
   }
 
-  async function onSignUp(values: z.infer<typeof SignUpForm.schema>) {
+  async function onSignUp(values: z.infer<typeof signUpSchema>) {
     try {
       setIsLoading(true);
       const { error } = await supabase.auth.signUp({
