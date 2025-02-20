@@ -1,37 +1,15 @@
+
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import * as z from "zod";
-import { Button } from "@/components/ui/button";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { ArrowRight } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import SignInForm from "@/components/auth/SignInForm";
+import SignUpForm from "@/components/auth/SignUpForm";
 import TwoFactorVerification from "@/components/auth/TwoFactorVerification";
-
-const signInSchema = z.object({
-  email: z.string().email("Please enter a valid email address"),
-  password: z.string().min(8, "Password must be at least 8 characters"),
-});
-
-const signUpSchema = z.object({
-  email: z.string().email("Please enter a valid email address"),
-  password: z.string().min(8, "Password must be at least 8 characters"),
-  firstName: z.string().min(2, "First name must be at least 2 characters"),
-  lastName: z.string().min(2, "Last name must be at least 2 characters"),
-});
+import * as z from "zod";
 
 const SignIn = () => {
   const { toast } = useToast();
@@ -39,24 +17,6 @@ const SignIn = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [showTwoFactor, setShowTwoFactor] = useState(false);
   const [tempSession, setTempSession] = useState<any>(null);
-
-  const signInForm = useForm<z.infer<typeof signInSchema>>({
-    resolver: zodResolver(signInSchema),
-    defaultValues: {
-      email: "",
-      password: "",
-    },
-  });
-
-  const signUpForm = useForm<z.infer<typeof signUpSchema>>({
-    resolver: zodResolver(signUpSchema),
-    defaultValues: {
-      email: "",
-      password: "",
-      firstName: "",
-      lastName: "",
-    },
-  });
 
   const checkUserBlockStatus = async (userId: string) => {
     const { data: profile, error } = await supabase
@@ -77,7 +37,7 @@ const SignIn = () => {
     };
   };
 
-  async function onSignIn(values: z.infer<typeof signInSchema>) {
+  async function onSignIn(values: z.infer<typeof SignInForm.schema>) {
     try {
       setIsLoading(true);
       const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
@@ -149,7 +109,7 @@ const SignIn = () => {
     }
   }
 
-  async function onSignUp(values: z.infer<typeof signUpSchema>) {
+  async function onSignUp(values: z.infer<typeof SignUpForm.schema>) {
     try {
       setIsLoading(true);
       const { error } = await supabase.auth.signUp({
@@ -240,115 +200,11 @@ const SignIn = () => {
               </TabsList>
 
               <TabsContent value="signin">
-                <Form {...signInForm}>
-                  <form onSubmit={signInForm.handleSubmit(onSignIn)} className="space-y-6">
-                    <FormField
-                      control={signInForm.control}
-                      name="email"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Email</FormLabel>
-                          <FormControl>
-                            <Input placeholder="john@example.com" type="email" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <FormField
-                      control={signInForm.control}
-                      name="password"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Password</FormLabel>
-                          <FormControl>
-                            <Input placeholder="********" type="password" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <Button type="submit" className="w-full" disabled={isLoading}>
-                      {isLoading ? "Signing in..." : (
-                        <>
-                          Sign In <ArrowRight className="w-4 h-4 ml-2" />
-                        </>
-                      )}
-                    </Button>
-                  </form>
-                </Form>
+                <SignInForm onSubmit={onSignIn} isLoading={isLoading} />
               </TabsContent>
 
               <TabsContent value="signup">
-                <Form {...signUpForm}>
-                  <form onSubmit={signUpForm.handleSubmit(onSignUp)} className="space-y-6">
-                    <FormField
-                      control={signUpForm.control}
-                      name="firstName"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>First Name</FormLabel>
-                          <FormControl>
-                            <Input placeholder="John" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <FormField
-                      control={signUpForm.control}
-                      name="lastName"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Last Name</FormLabel>
-                          <FormControl>
-                            <Input placeholder="Doe" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <FormField
-                      control={signUpForm.control}
-                      name="email"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Email</FormLabel>
-                          <FormControl>
-                            <Input placeholder="john@example.com" type="email" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <FormField
-                      control={signUpForm.control}
-                      name="password"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Password</FormLabel>
-                          <FormControl>
-                            <Input placeholder="********" type="password" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <Button type="submit" className="w-full" disabled={isLoading}>
-                      {isLoading ? "Signing up..." : (
-                        <>
-                          Sign Up <ArrowRight className="w-4 h-4 ml-2" />
-                        </>
-                      )}
-                    </Button>
-                  </form>
-                </Form>
+                <SignUpForm onSubmit={onSignUp} isLoading={isLoading} />
               </TabsContent>
             </Tabs>
           </div>
