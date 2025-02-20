@@ -1,4 +1,3 @@
-
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import { useToast } from "@/components/ui/use-toast";
@@ -32,7 +31,7 @@ const SignIn = () => {
 
     return { 
       blocked: profile?.is_blocked ? profile.blocked_reason : false,
-      twoFactorMethod: profile?.two_factor_method,
+      twoFactorMethod: profile?.two_factor_method || 'none',
       phoneNumber: profile?.phone_number
     };
   };
@@ -65,7 +64,7 @@ const SignIn = () => {
         return;
       }
 
-      if (twoFactorMethod === 'sms') {
+      if (twoFactorMethod === 'sms' && phoneNumber) {
         setTempSession(signInData);
         const code = Math.floor(100000 + Math.random() * 900000).toString();
         
