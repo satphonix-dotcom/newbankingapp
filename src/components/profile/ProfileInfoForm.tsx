@@ -110,24 +110,44 @@ const ProfileInfoForm = ({ userId, initialData, onSuccess }: ProfileInfoFormProp
   );
 
   const onSubmit = async (values: FormValues) => {
-    if (!userId) return;
+    if (!userId) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "User ID not found. Please try signing in again.",
+      });
+      return;
+    }
+
     setIsLoading(true);
     try {
-      console.log("Updating profile with values:", values);
-      const fullPhoneNumber = values.phone_number ? `${values.country_code} ${values.phone_number}` : null;
+      console.log("Starting profile update with values:", values);
 
       // First update auth email if it changed
-      const user = (await supabase.auth.getUser()).data.user;
+      const { data: { user } } = await supabase.auth.getUser();
       if (user && user.email !== values.email) {
+        console.log("Updating email in auth...");
         const { error: emailError } = await supabase.auth.updateUser({
           email: values.email,
         });
 
-        if (emailError) throw emailError;
+        if (emailError) {
+          console.error("Email update error:", emailError);
+          throw new Error("Failed to update email: " + emailError.message);
+        }
+        
+        toast({
+          title: "Email Update",
+          description: "Please check your inbox to confirm your new email address.",
+        });
       }
 
+      // Format phone number
+      const fullPhoneNumber = values.phone_number ? `${values.country_code} ${values.phone_number}` : null;
+      console.log("Formatted phone number:", fullPhoneNumber);
+
       // Then update profile
-      const { error } = await supabase
+      const { error: profileError } = await supabase
         .from("profiles")
         .update({
           first_name: values.first_name,
@@ -141,19 +161,31 @@ const ProfileInfoForm = ({ userId, initialData, onSuccess }: ProfileInfoFormProp
         })
         .eq("id", userId);
 
-      if (error) throw error;
+      if (profileError) {
+        console.error("Profile update error:", profileError);
+        throw new Error("Failed to update profile: " + profileError.message);
+      }
 
       toast({
         title: "Success",
-        description: "Profile updated successfully",
+        description: "Your profile has been updated successfully.",
       });
-      onSuccess();
+
+      // If phone number changed, show additional toast
+      if (fullPhoneNumber !== initialData.phone_number && fullPhoneNumber) {
+        toast({
+          title: "Phone Number Changed",
+          description: "Please verify your new phone number to use it for 2FA.",
+        });
+      }
+
+      onSuccess(); // Trigger refetch of profile data
     } catch (error: any) {
       console.error("Profile update error:", error);
       toast({
         variant: "destructive",
         title: "Error",
-        description: error.message || "Failed to update profile",
+        description: error.message || "Failed to update profile. Please try again.",
       });
     } finally {
       setIsLoading(false);
