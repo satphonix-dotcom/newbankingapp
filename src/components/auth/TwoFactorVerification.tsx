@@ -19,12 +19,15 @@ const TwoFactorVerification = ({ onVerificationComplete, phoneNumber }: TwoFacto
   const verifyCode = async () => {
     try {
       setIsLoading(true);
+      const userId = (await supabase.auth.getUser()).data.user?.id;
+      if (!userId) throw new Error('User not authenticated');
 
       // Get the latest verification code for this user
       const { data: codes, error: fetchError } = await supabase
         .from('verification_codes')
         .select('*')
         .eq('type', 'sms')
+        .eq('user_id', userId)
         .order('created_at', { ascending: false })
         .limit(1);
 
@@ -52,14 +55,19 @@ const TwoFactorVerification = ({ onVerificationComplete, phoneNumber }: TwoFacto
         .update({ verified: true })
         .eq('id', latestCode.id);
 
-      // Update phone verification status
-      await supabase
+      // Update phone verification status and ensure phone number is set
+      const { error: profileError } = await supabase
         .from('profiles')
         .update({ 
           phone_verified: true,
           phone_number: phoneNumber 
         })
-        .eq('id', (await supabase.auth.getUser()).data.user?.id);
+        .eq('id', userId);
+
+      if (profileError) {
+        console.error("Profile update error:", profileError);
+        throw new Error("Failed to update profile verification status");
+      }
 
       toast({
         title: "Success",
@@ -68,6 +76,7 @@ const TwoFactorVerification = ({ onVerificationComplete, phoneNumber }: TwoFacto
 
       onVerificationComplete();
     } catch (error: any) {
+      console.error("Verification error:", error);
       toast({
         variant: "destructive",
         title: "Error",
