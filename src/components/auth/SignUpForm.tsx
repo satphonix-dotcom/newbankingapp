@@ -21,13 +21,15 @@ export const signUpSchema = z.object({
   lastName: z.string().min(2, "Last name must be at least 2 characters"),
 });
 
+export type SignUpFormValues = z.infer<typeof signUpSchema>;
+
 interface SignUpFormProps {
-  onSubmit: (values: z.infer<typeof signUpSchema>) => Promise<void>;
+  onSubmit: (values: SignUpFormValues) => Promise<void>;
   isLoading: boolean;
 }
 
 const SignUpForm = ({ onSubmit, isLoading }: SignUpFormProps) => {
-  const form = useForm<z.infer<typeof signUpSchema>>({
+  const form = useForm<SignUpFormValues>({
     resolver: zodResolver(signUpSchema),
     defaultValues: {
       email: "",
