@@ -113,13 +113,31 @@ const ProfileInfoForm = ({ userId, initialData, onSuccess }: ProfileInfoFormProp
     if (!userId) return;
     setIsLoading(true);
     try {
+      console.log("Updating profile with values:", values);
+      const fullPhoneNumber = values.phone_number ? `${values.country_code} ${values.phone_number}` : null;
+
+      // First update auth email if it changed
+      const user = (await supabase.auth.getUser()).data.user;
+      if (user && user.email !== values.email) {
+        const { error: emailError } = await supabase.auth.updateUser({
+          email: values.email,
+        });
+
+        if (emailError) throw emailError;
+      }
+
+      // Then update profile
       const { error } = await supabase
         .from("profiles")
         .update({
           first_name: values.first_name,
           last_name: values.last_name,
-          phone_number: `${values.country_code} ${values.phone_number}`,
+          phone_number: fullPhoneNumber,
           email: values.email,
+          // Reset phone verification if phone number changes
+          phone_verified: fullPhoneNumber === initialData.phone_number,
+          // Reset 2FA if phone number changes
+          two_factor_method: fullPhoneNumber === initialData.phone_number ? undefined : 'none'
         })
         .eq("id", userId);
 
@@ -130,12 +148,12 @@ const ProfileInfoForm = ({ userId, initialData, onSuccess }: ProfileInfoFormProp
         description: "Profile updated successfully",
       });
       onSuccess();
-    } catch (error) {
+    } catch (error: any) {
       console.error("Profile update error:", error);
       toast({
         variant: "destructive",
         title: "Error",
-        description: "Failed to update profile",
+        description: error.message || "Failed to update profile",
       });
     } finally {
       setIsLoading(false);
@@ -196,11 +214,11 @@ const ProfileInfoForm = ({ userId, initialData, onSuccess }: ProfileInfoFormProp
                   value={field.value || "+1"}
                 >
                   <FormControl>
-                    <SelectTrigger className="bg-white">
+                    <SelectTrigger>
                       <SelectValue placeholder="Select country code" />
                     </SelectTrigger>
                   </FormControl>
-                  <SelectContent className="bg-white max-h-[200px]">
+                  <SelectContent>
                     <div className="p-2">
                       <Input
                         placeholder="Search country..."
@@ -209,17 +227,14 @@ const ProfileInfoForm = ({ userId, initialData, onSuccess }: ProfileInfoFormProp
                         className="mb-2"
                       />
                     </div>
-                    <div className="max-h-[150px] overflow-y-auto">
-                      {filteredCountryCodes.map((country) => (
-                        <SelectItem
-                          key={country.code}
-                          value={country.code}
-                          className="hover:bg-gray-100"
-                        >
-                          {country.code} ({country.country})
-                        </SelectItem>
-                      ))}
-                    </div>
+                    {filteredCountryCodes.map((country) => (
+                      <SelectItem
+                        key={country.code}
+                        value={country.code}
+                      >
+                        {country.code} ({country.country})
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </FormItem>
